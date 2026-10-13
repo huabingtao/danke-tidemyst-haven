@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { X, Gem } from "lucide-react";
+import { X, Gem, RotateCcw } from "lucide-react";
 import { coordinate } from "./BoardGrid";
 import type { Cell } from "../core/models";
 interface Props {
@@ -8,8 +8,16 @@ interface Props {
   cell: Cell;
   onApply: (value: "gem" | number) => void;
   onClose: () => void;
+  onReset: () => void;
 }
-export function CellEditor({ selected, size, cell, onApply, onClose }: Props) {
+export function CellEditor({
+  selected,
+  size,
+  cell,
+  onApply,
+  onClose,
+  onReset,
+}: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     dialog.current?.showModal();
@@ -78,6 +86,14 @@ export function CellEditor({ selected, size, cell, onApply, onClose }: Props) {
           </button>
         ))}
       </div>
+      <button
+        className="secondary-button cell-reset"
+        onClick={onReset}
+        aria-label="重置此格"
+      >
+        <RotateCcw size={16} />
+        重置此格
+      </button>
       <p className="editor-note">数字表示周围八格中的宝石数量</p>
     </dialog>
   );

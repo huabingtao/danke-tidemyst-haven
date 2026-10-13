@@ -1,4 +1,5 @@
 import { type CSSProperties } from "react";
+import { useBoardLayout } from "../hooks/useBoardLayout";
 import type { Board, SolveResult } from "../core/models";
 export type BoardView = "standard" | "heatmap" | "recommendations";
 export function percent(p: number) {
@@ -27,15 +28,27 @@ export function BoardGrid({
   uncertain,
   compact,
 }: Props) {
+  const { ref, layout } = useBoardLayout(board.size);
   return (
     <div
       className={`board-scroll ${compact ? "compact-board" : ""}`}
-      tabIndex={0}
-      aria-label="棋盘横向滚动区域"
+      ref={ref}
+      aria-label="棋盘区域"
     >
       <div
         className="board-grid"
-        style={{ "--size": board.size } as CSSProperties}
+        style={
+          {
+            "--size": board.size,
+            "--axis-size": `${layout.axis}px`,
+            "--grid-gap": `${layout.gap}px`,
+            "--grid-width": layout.width ? `${layout.width}px` : "100%",
+            "--number-font": layout.cell ? `${layout.numberFont}px` : "16px",
+            "--probability-font": layout.cell
+              ? `${layout.probabilityFont}px`
+              : "10px",
+          } as CSSProperties
+        }
         role="group"
         aria-label={`${board.size}乘${board.size}棋盘`}
       >
@@ -102,6 +115,13 @@ export function BoardGrid({
                         o === "unknown" && p !== 0 && p !== 1
                           ? "probability-value"
                           : ""
+                      }
+                      style={
+                        o === "unknown" && p !== 0 && p !== 1 && layout.cell
+                          ? {
+                              fontSize: `${Math.min(layout.probabilityFont, (layout.cell - 4) / (text.length * 0.7))}px`,
+                            }
+                          : undefined
                       }
                     >
                       {text}

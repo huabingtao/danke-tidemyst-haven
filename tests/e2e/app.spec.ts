@@ -29,7 +29,7 @@ async function upload(page: Page, testInfo: TestInfo, files: string[]) {
   await (await choosing).setFiles(files.map((f) => path.resolve(f)));
 }
 
-test("edit modal has exactly gem and 0–8; rounded probabilities, recommendation and all legend states", async ({
+test("edit modal has gem, 0–8 and reset; rounded probabilities, recommendation and all legend states", async ({
   page,
 }) => {
   await page.goto("/");
@@ -86,8 +86,14 @@ test("edit modal has exactly gem and 0–8; rounded probabilities, recommendatio
     /dark|light/,
   );
   const box = await page.getByTestId("cell-0").boundingBox();
-  expect(box!.width).toBeGreaterThanOrEqual(44);
-  expect(box!.height).toBeGreaterThanOrEqual(44);
+  const minimum = page.viewportSize()!.width >= 640 ? 44 : 18;
+  expect(box!.width).toBeGreaterThanOrEqual(minimum);
+  expect(box!.height).toBeGreaterThanOrEqual(minimum);
+  expect(
+    await page
+      .locator(".board-scroll")
+      .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+  ).toBe(true);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -410,3 +416,224 @@ for (const variant of [
     await expect(page.getByText("精确计算", { exact: false })).toBeVisible();
   });
 }
+
+test("cell dialog reset clears only this cell and participates in undo, redo and persistence", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  await observe(page, 0, "gem");
+  await observe(page, 10, 2);
+  await page.getByRole("button", { name: "推测旗标工具" }).click();
+  await page.getByTestId("cell-0").click();
+  await page.getByRole("button", { name: "推测旗标工具" }).click();
+  await page.getByTestId("cell-0").click();
+  await page
+    .getByRole("dialog", { name: "编辑 A1" })
+    .getByRole("button", { name: "重置此格", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByTestId("cell-0")).not.toHaveAttribute(
+    "aria-label",
+    /已发现宝石|推测旗标/,
+  );
+  await expect(page.getByTestId("cell-10")).toHaveAttribute(
+    "aria-label",
+    /数字 2/,
+  );
+  await page.getByRole("button", { name: "撤销", exact: true }).first().click();
+  await expect(page.getByTestId("cell-0")).toHaveAttribute(
+    "aria-label",
+    /已发现宝石.*推测旗标/,
+  );
+  await page.getByRole("button", { name: "重做", exact: true }).click();
+  await page.reload();
+  await expect(page.getByTestId("cell-0")).not.toHaveAttribute(
+    "aria-label",
+    /已发现宝石|推测旗标/,
+  );
+  await observe(page, 10, 3);
+  await page.getByTestId("cell-10").click();
+  await page.getByRole("button", { name: "重置此格", exact: true }).click();
+  await expect(page.getByTestId("cell-10")).not.toHaveAttribute(
+    "aria-label",
+    /数字/,
+  );
+  // Existing low-confidence candidates must be cleared as well, not reappear on reload.
+  await upload(page, testInfo, ["tests/fixtures/board-8.png"]);
+  await expect(page.getByRole("heading", { name: "房间 2" })).toBeVisible();
+  await page.getByTestId("cell-18").click();
+  await page.getByRole("button", { name: "重置此格", exact: true }).click();
+  await page.reload();
+  await expect(page.getByTestId("cell-18")).not.toHaveAttribute(
+    "aria-label",
+    /需要核对/,
+  );
+});
+test("all board sizes fit without internal scrolling and react to live viewport changes", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  for (const size of [8, 10, 12]) {
+    if (size !== 8) {
+      await page
+        .getByRole("combobox", { name: "新房间尺寸" })
+        .selectOption(String(size));
+      await page.getByRole("button", { name: "新建房间", exact: true }).click();
+    }
+    let previousWidth = 0;
+    for (const width of [320, 375, 390, 430, 768, 844]) {
+      await page.setViewportSize({ width, height: width === 844 ? 390 : 844 });
+      const viewport = page.locator(".board-scroll");
+      await expect
+        .poll(() =>
+          viewport.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+        )
+        .toBe(true);
+      const bounds = await viewport.boundingBox();
+      const last = await page.getByTestId(`cell-${size - 1}`).boundingBox();
+      const first = await page.getByTestId("cell-0").boundingBox();
+      expect(last!.x + last!.width).toBeLessThanOrEqual(
+        bounds!.x + bounds!.width + 1,
+      );
+      expect(Math.abs(first!.width - first!.height)).toBeLessThan(1);
+      expect(first!.width).toBeGreaterThan(18);
+      if (width === 375) expect(first!.width).toBeGreaterThan(previousWidth);
+      previousWidth = first!.width;
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth + 1,
+        ),
+      ).toBe(true);
+    }
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".board-surface").scrollIntoViewIfNeeded();
+  await page.locator(".board-surface").screenshot({
+    path: `docs/screenshots/adaptive-12-${testInfo.project.name}.png`,
+  });
+  await page.getByTestId("cell-0").click();
+  await expect(
+    page.getByRole("button", { name: "重置此格", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: `docs/screenshots/reset-dialog-${testInfo.project.name}.png`,
+  });
+});
+
+test("progress share links restore a frozen room without overwriting other rooms or duplicating on refresh", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  await observe(page, 0, "gem");
+  await observe(page, 10, 2);
+  await page.getByRole("button", { name: "推测旗标工具" }).click();
+  await page.getByTestId("cell-2").click();
+  await page.getByRole("button", { name: "推测旗标工具" }).click();
+  await page.getByRole("button", { name: "分享当前进度", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "分享链接", exact: true });
+  await expect(dialog).toBeVisible();
+  const link = await dialog
+    .getByRole("textbox", { name: "分享链接地址" })
+    .inputValue();
+  expect(link).toContain("#progress=");
+  expect(link.length).toBeLessThan(600);
+  await expect(dialog).toContainText("本地测试地址");
+  await dialog.getByRole("button", { name: "关闭分享" }).click();
+  await observe(page, 0, 1);
+  // Navigate to a smaller shared board while a larger board's last-cell editor is open.
+  await page.getByRole("combobox", { name: "新房间尺寸" }).selectOption("12");
+  await page.getByRole("button", { name: "新建房间", exact: true }).click();
+  await page.getByTestId("cell-143").click();
+  await page.goto(link);
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByTestId("cell-0")).toHaveAttribute(
+    "aria-label",
+    /已发现宝石/,
+  );
+  await expect(page.getByTestId("cell-10")).toHaveAttribute(
+    "aria-label",
+    /数字 2/,
+  );
+  await expect(page.getByTestId("cell-2")).toHaveAttribute(
+    "aria-label",
+    /推测旗标/,
+  );
+  await expect(page.getByRole("button", { name: /切换房间/ })).toHaveCount(3);
+  await observe(page, 1, 3);
+  await page.reload();
+  await expect(page.getByRole("button", { name: /切换房间/ })).toHaveCount(3);
+  await expect(page.getByTestId("cell-1")).toHaveAttribute(
+    "aria-label",
+    /数字 3/,
+  );
+  await page.getByRole("button", { name: "分享工具", exact: true }).click();
+  await expect(dialog).toBeVisible();
+  expect(
+    await dialog.getByRole("textbox", { name: "分享链接地址" }).inputValue(),
+  ).not.toContain("#progress=");
+  await page.screenshot({
+    path: `docs/screenshots/share-${testInfo.project.name}.png`,
+  });
+});
+test("link copy supports browser denial and invalid snapshots keep existing data", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: () => Promise.reject(new Error("denied")) },
+    });
+    document.execCommand = () => false;
+  });
+  await page.goto("/");
+  await observe(page, 0, "gem");
+  await page.getByRole("button", { name: "分享工具", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "分享链接", exact: true });
+  await expect(dialog).toBeVisible();
+  await dialog
+    .getByRole("button", { name: "复制测试链接", exact: true })
+    .click();
+  await expect(dialog).toContainText("长按");
+  await dialog.getByRole("button", { name: "关闭分享" }).click();
+  await page.goto("/#progress=not-a-complete-link");
+  await expect(page.getByRole("status")).toContainText("分享链接无效");
+  await expect(page.getByTestId("cell-0")).toHaveAttribute(
+    "aria-label",
+    /已发现宝石/,
+  );
+  await expect(page.getByRole("button", { name: /切换房间/ })).toHaveCount(1);
+});
+
+test("one copy button places the exact progress link on the clipboard", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: (text: string) => {
+          (window as Window & { copiedShare?: string }).copiedShare = text;
+          return Promise.resolve();
+        },
+      },
+    }),
+  );
+  await page.goto("/");
+  await observe(page, 0, "gem");
+  await page.getByRole("button", { name: "分享当前进度", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "分享链接", exact: true });
+  await expect(dialog).toBeVisible();
+  const link = await dialog
+    .getByRole("textbox", { name: "分享链接地址" })
+    .inputValue();
+  await dialog
+    .getByRole("button", { name: "复制测试链接", exact: true })
+    .click();
+  await expect(dialog).toContainText("测试链接已复制");
+  expect(
+    await page.evaluate(
+      () => (window as Window & { copiedShare?: string }).copiedShare,
+    ),
+  ).toBe(link);
+  expect(link).toContain("#progress=");
+});

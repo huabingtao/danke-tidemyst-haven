@@ -1,3 +1,4 @@
+import type { SharePayload } from "./sharing";
 export function detectEnvironment() {
   const ua = navigator.userAgent;
   return {
@@ -15,6 +16,7 @@ export function detectEnvironment() {
   };
 }
 export interface HostAdapter {
+  share?: (payload: SharePayload) => Promise<void>;
   back?: () => void;
   notifyBoardChanged?: (room: string) => void;
 }

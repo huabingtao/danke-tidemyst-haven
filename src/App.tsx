@@ -12,11 +12,19 @@ import {
   HelpCircle,
   X,
   Check,
-  ChevronDown,
   Flag,
   Eraser,
+  Share2,
 } from "lucide-react";
 import { useBoards } from "./stores/boards";
+import { useSharedBoard } from "./hooks/useSharedBoard";
+import { ShareDialog } from "./components/ShareDialog";
+import { progressLink, toolLink } from "./features/sharing/links";
+import {
+  shareLink,
+  type SharePayload,
+  type ShareResult,
+} from "./adapters/sharing";
 import { useSolver } from "./hooks/useSolver";
 import {
   BoardGrid,
@@ -49,6 +57,39 @@ export default function App() {
     [toast, setToast] = useState(""),
     [help, setHelp] = useState(false),
     [roomDraft, setRoomDraft] = useState(board?.room ?? "");
+  const [share, setShare] = useState<{
+    payload: SharePayload;
+    result: ShareResult;
+  } | null>(null);
+  const [sharing, setSharing] = useState(false);
+  useSharedBoard(setToast);
+  const sendShare = async (kind: "progress" | "tool") => {
+    if (sharing) return;
+    setSharing(true);
+    try {
+      const base = import.meta.env.VITE_PUBLIC_APP_URL || window.location.href;
+      const payload: SharePayload =
+        kind === "progress" && board
+          ? {
+              title: `房间 ${board.room} 的潮汐秘境进度`,
+              text: `${board.size}×${board.size} · 已发现 ${board.cells.filter((c) => c.observed === "gem").length}/${board.totalGems} 颗宝石`,
+              url: progressLink(board, base),
+            }
+          : {
+              title: "潮汐秘境 · 宝石推理助手",
+              text: "录入棋盘或读取游戏截图，推算宝石概率与下一步位置。",
+              url: toolLink(base),
+            };
+      const result = await shareLink(payload);
+      if (result.method === "native" || result.method === "canceled")
+        setToast(result.message);
+      else setShare({ payload, result });
+    } catch (e) {
+      setToast(e instanceof Error ? e.message : "无法生成分享链接，请重试");
+    } finally {
+      setSharing(false);
+    }
+  };
   const fileInput = useRef<HTMLInputElement>(null),
     cameraInput = useRef<HTMLInputElement>(null);
   const [theme, setTheme] = useState(() => {
@@ -112,7 +153,7 @@ export default function App() {
     return () => document.removeEventListener("keydown", handler);
   }, [store.undo, store.redo, upload]);
   const apply = (value: "gem" | number) => {
-    if (board && selected !== null)
+    if (board && selected !== null && board.cells[selected])
       store.setCell(board.id, selected, {
         observed: value,
         flagged: board.cells[selected].flagged,
@@ -180,6 +221,15 @@ export default function App() {
             <ShieldCheck size={15} />
             本地处理，安心使用
           </span>
+          <button
+            className="icon-button"
+            aria-label="分享工具"
+            title="分享工具"
+            disabled={sharing}
+            onClick={() => void sendShare("tool")}
+          >
+            <Share2 size={20} />
+          </button>
           <button
             className="icon-button"
             aria-label="使用说明"
@@ -304,6 +354,15 @@ export default function App() {
                 </div>
                 <div className="history-buttons">
                   <button
+                    className="icon-button"
+                    aria-label="分享当前进度"
+                    title="分享当前进度"
+                    disabled={sharing}
+                    onClick={() => void sendShare("progress")}
+                  >
+                    <Share2 size={17} />
+                  </button>
+                  <button
                     className={`icon-button ${editMode === "flag" ? "active" : ""}`}
                     aria-label="推测旗标工具"
                     aria-pressed={editMode === "flag"}
@@ -366,10 +425,7 @@ export default function App() {
                         : "点击格子，选择宝石或 0–8"
                     : `已选 ${coordinate(selected, board.size)}`}
                 </span>
-                <span>
-                  大棋盘可左右滑动{" "}
-                  <ChevronDown size={12} className="scroll-chevron" />
-                </span>
+                <span>棋盘随屏幕自动适配</span>
               </div>
               <BoardLegend />
               <div className="board-bottom">
@@ -492,14 +548,28 @@ export default function App() {
           </button>
         </div>
       )}
-      {board && selected !== null && (
+      {board && selected !== null && board.cells[selected] && (
         <CellEditor
           key={`${board.id}/${selected}`}
           selected={selected}
           size={board.size}
           cell={board.cells[selected]}
           onApply={apply}
+          onReset={() => {
+            store.setCell(board.id, selected, {
+              observed: "unknown",
+              flagged: false,
+            });
+            setSelected(null);
+          }}
           onClose={() => setSelected(null)}
+        />
+      )}
+      {share && (
+        <ShareDialog
+          payload={share.payload}
+          result={share.result}
+          onClose={() => setShare(null)}
         />
       )}
       {sourcePicker && (

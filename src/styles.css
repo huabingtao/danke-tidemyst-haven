@@ -510,18 +510,21 @@ button svg {
   padding: 20px 14px 24px;
 }
 .board-scroll {
-  overflow: auto;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
+  overflow: visible;
   border-radius: 4px;
 }
 .board-grid {
   display: grid;
-  grid-template-columns: 22px repeat(var(--size), minmax(44px, 1fr));
-  gap: 5px;
-  width: max(100%, calc(22px + var(--size) * 49px));
-  max-width: 640px;
+  grid-template-columns: var(--axis-size, 22px) repeat(
+      var(--size),
+      minmax(0, 1fr)
+    );
+  gap: var(--grid-gap, 5px);
+  width: var(--grid-width, 100%);
+  max-width: 100%;
   margin: auto;
   user-select: none;
   -webkit-user-select: none;
@@ -541,15 +544,15 @@ button svg {
   border: 1px solid transparent;
   border-radius: 6px;
   aspect-ratio: 1;
-  min-height: 44px;
-  min-width: 44px;
+  min-height: 0;
+  min-width: 0;
   background: var(--cell);
   color: var(--ink);
   position: relative;
   display: grid;
   place-items: center;
   padding: 0;
-  font-size: 22px;
+  font-size: var(--number-font, 22px);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   touch-action: manipulation;
@@ -559,7 +562,8 @@ button svg {
   border-color: var(--primary);
 }
 .probability-value {
-  font-size: 12px;
+  white-space: nowrap;
+  font-size: var(--probability-font, 12px);
   font-weight: 550;
   letter-spacing: -0.03em;
 }
@@ -1605,14 +1609,6 @@ progress {
     padding: 12px 6px 15px;
     border-radius: 9px;
   }
-  .board-grid {
-    gap: 4px;
-    width: max(100%, calc(20px + var(--size) * 48px));
-    grid-template-columns: 20px repeat(var(--size), minmax(44px, 1fr));
-  }
-  .probability-value {
-    font-size: 11px;
-  }
   .axis-cell {
     font-size: 9px;
   }
@@ -1815,12 +1811,8 @@ progress {
     scroll-behavior: auto !important;
   }
 }
-/* Keep the working board visible in typical desktop windows and preserve touch targets. */
+/* Desktop controls retain generous targets; board cells fit their actual container. */
 @media (min-width: 640px) {
-  .board-grid {
-    max-width: 480px;
-    min-width: calc(22px + var(--size) * 49px);
-  }
   .coordinate-list button {
     min-height: 44px;
   }
@@ -1889,7 +1881,8 @@ progress {
 /* Revision: focused cell dialog, eight complete legend states, automatic import. */
 .cell-dialog,
 .image-source-dialog,
-.automatic-import-dialog {
+.automatic-import-dialog,
+.share-dialog {
   background: var(--bg);
   color: var(--ink);
   border: 1px solid var(--line);
@@ -1902,7 +1895,8 @@ progress {
 }
 .cell-dialog::backdrop,
 .image-source-dialog::backdrop,
-.automatic-import-dialog::backdrop {
+.automatic-import-dialog::backdrop,
+.share-dialog::backdrop {
   background: var(--overlay);
 }
 .cell-dialog .editor-header {
@@ -2153,4 +2147,97 @@ progress {
   .automatic-import-dialog .dialog-header {
     padding-top: 18px;
   }
+}
+
+.cell-reset {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+  justify-content: center;
+}
+@media (max-width: 639px) {
+  .board-settings,
+  .board-toolbar {
+    flex-wrap: wrap;
+  }
+  .board-toolbar {
+    row-gap: 8px;
+  }
+  .history-buttons {
+    margin-left: auto;
+  }
+  .board-cell {
+    border-radius: 4px;
+  }
+  .cell-dot {
+    bottom: 2px;
+    width: 3px;
+    height: 3px;
+  }
+  .cell-flag,
+  .cell-review-marker,
+  .cell-conflict {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 359px) {
+  .board-main {
+    padding-inline: 12px;
+  }
+  .board-surface {
+    padding-inline: 3px;
+  }
+}
+
+.share-dialog {
+  width: min(380px, calc(100vw - 32px));
+}
+.share-dialog h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+}
+.share-dialog .icon-button {
+  width: 44px;
+  height: 44px;
+}
+.share-title {
+  display: block;
+  margin-top: 16px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.share-description,
+.share-message,
+.share-footnote {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.share-description {
+  color: var(--muted);
+  margin-top: 4px;
+}
+.share-message {
+  margin: 16px 0 12px;
+}
+.share-dialog textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 12px;
+  resize: none;
+  overflow-wrap: anywhere;
+}
+.share-dialog .primary-button {
+  width: 100%;
+  margin-top: 12px;
+}
+.share-footnote {
+  color: var(--muted);
+  margin-top: 14px;
 }
