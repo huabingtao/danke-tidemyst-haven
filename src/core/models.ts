@@ -3,6 +3,14 @@ export type Observation = "unknown" | "gem" | "safe" | number;
 export interface Cell {
   observed: Observation;
   flagged: boolean;
+  recognition?: { suggested: Observation; confidence: number; reason: string };
+}
+export interface Recommendation {
+  best: number[];
+  next: number[];
+  information: number[];
+  max: number;
+  strategy: "certain" | "exact-information" | "neighbor-coverage";
 }
 export interface Board {
   id: string;
@@ -21,6 +29,7 @@ export interface SolveResult {
   layouts: string;
   nodes: number;
   elapsedMs: number;
+  recommendation?: Recommendation;
 }
 export const DEFAULT_GEMS: Record<BoardSize, number> = {
   8: 20,
@@ -109,7 +118,37 @@ export function validateBoards(input: unknown): Board[] {
         typeof c.flagged !== "boolean"
       )
         throw new Error("格子状态无效");
-      return { observed: o, flagged: c.flagged };
+      const cell: Cell = { observed: o, flagged: c.flagged };
+      if (c.recognition !== undefined) {
+        const r = c.recognition;
+        if (!r || typeof r !== "object") throw new Error("识别标记无效");
+        const record = r as Record<string, unknown>;
+        const suggested = record.suggested;
+        if (
+          !(
+            suggested === "unknown" ||
+            suggested === "gem" ||
+            suggested === "safe" ||
+            (typeof suggested === "number" &&
+              Number.isInteger(suggested) &&
+              suggested >= 0 &&
+              suggested <= 8)
+          ) ||
+          typeof record.confidence !== "number" ||
+          !Number.isFinite(record.confidence) ||
+          record.confidence < 0 ||
+          record.confidence > 1 ||
+          typeof record.reason !== "string" ||
+          record.reason.length > 250
+        )
+          throw new Error("识别标记无效");
+        cell.recognition = {
+          suggested,
+          confidence: record.confidence,
+          reason: record.reason,
+        };
+      }
+      return cell;
     });
     return {
       id: b.id,

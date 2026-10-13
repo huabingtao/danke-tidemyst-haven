@@ -1,5 +1,7 @@
 # 潮汐秘境 H5 实施计划
 
+> 本文件保留初版实施过程；当前交互、自动识别和推荐排序以 [修订计划](REVISION_PLAN.md)、架构及算法文档为准。
+
 目标：交付支持移动端、PC 和未来微信 web-view 的中文本地宝石概率工具。
 架构：React / TypeScript / Vite / Tailwind / Zustand；纯函数核心与 Web Worker 隔离；图片 Canvas 特征、字体模板和 Tesseract 混合识别；静态同源 OCR 资源。
 执行方式：当前会话逐项实现与检查。用户已授权按完整需求自动实施，无需再次审批方案。

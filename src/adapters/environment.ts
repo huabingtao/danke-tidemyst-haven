@@ -9,6 +9,9 @@ export function detectEnvironment() {
     offscreen: typeof OffscreenCanvas !== "undefined",
     file: typeof FileReader !== "undefined",
     cameraHint: /Android|iPhone|iPad/i.test(ua),
+    mobile:
+      /Android|iPhone|iPad|iPod/i.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1),
   };
 }
 export interface HostAdapter {

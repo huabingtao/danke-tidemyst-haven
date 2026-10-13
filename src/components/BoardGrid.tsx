@@ -2,9 +2,7 @@ import { type CSSProperties } from "react";
 import type { Board, SolveResult } from "../core/models";
 export type BoardView = "standard" | "heatmap" | "recommendations";
 export function percent(p: number) {
-  if (p > 0 && p < 0.0001) return "<0.01%";
-  if (p < 1 && p > 0.9999) return ">99.99%";
-  return `${Number((p * 100).toFixed(2))}%`;
+  return `${Math.round(p * 100)}%`;
 }
 export function coordinate(index: number, size: number) {
   return `${String.fromCharCode(65 + (index % size))}${Math.floor(index / size) + 1}`;
@@ -57,10 +55,9 @@ export function BoardGrid({
                   o = cell.observed,
                   p =
                     result?.status === "exact" ? result.probabilities[i] : null;
-                const isBest =
-                    best.includes(i) && best.length < board.cells.length * 0.75,
+                const isBest = best.includes(i),
                   isConflict = result?.conflictCells.includes(i),
-                  review = uncertain?.has(i);
+                  review = uncertain?.has(i) || !!cell.recognition;
                 const state =
                   o === "gem"
                     ? "gem"
@@ -81,7 +78,7 @@ export function BoardGrid({
                       : o === "safe"
                         ? "✓"
                         : p === 1
-                          ? "◆"
+                          ? "100"
                           : p === 0
                             ? "×"
                             : p !== null && p !== undefined
@@ -96,7 +93,8 @@ export function BoardGrid({
                     aria-label={label}
                     aria-pressed={selected === i}
                     onClick={() => onSelect(i)}
-                    className={`board-cell ${state} ${selected === i ? "selected" : ""} ${isBest ? "best" : ""} ${isConflict ? "conflict" : ""} ${review ? "review" : ""} ${view === "recommendations" && o === "unknown" && !isBest && p !== 1 ? "dimmed" : ""} ${view === "heatmap" && o === "unknown" ? "heat" : ""}`}
+                    data-recommended={isBest ? "true" : undefined}
+                    className={`board-cell ${state} ${cell.flagged ? "flagged" : ""} ${selected === i ? "selected" : ""} ${isBest ? "best" : ""} ${isConflict ? "conflict" : ""} ${review ? "review" : ""} ${view === "recommendations" && o === "unknown" && !isBest && p !== 1 ? "dimmed" : ""} ${view === "heatmap" && o === "unknown" ? "heat" : ""}`}
                     style={{ "--heat": p ?? 0 } as CSSProperties}
                   >
                     <span
@@ -113,8 +111,10 @@ export function BoardGrid({
                         ⚑
                       </span>
                     )}
-                    {state === "certain" && (
-                      <span className="certainty-label">100%</span>
+                    {review && (
+                      <span className="cell-review-marker" aria-hidden="true">
+                        ?
+                      </span>
                     )}
                     {isConflict && (
                       <span className="cell-conflict" aria-hidden="true">

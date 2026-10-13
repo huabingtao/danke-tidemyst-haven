@@ -1,4 +1,4 @@
-import { useEffect, useState, type DragEvent } from "react";
+import { useEffect, useRef, useState, type DragEvent } from "react";
 import {
   Gem,
   Sun,
@@ -13,6 +13,8 @@ import {
   X,
   Check,
   ChevronDown,
+  Flag,
+  Eraser,
 } from "lucide-react";
 import { useBoards } from "./stores/boards";
 import { useSolver } from "./hooks/useSolver";
@@ -22,25 +24,33 @@ import {
   coordinate,
   percent,
 } from "./components/BoardGrid";
-import { CellEditor, type Brush } from "./components/CellEditor";
+import { CellEditor } from "./components/CellEditor";
+import { BoardLegend } from "./components/BoardLegend";
+import { ImageSourcePicker } from "./components/ImageSourcePicker";
 import { RoomList } from "./components/RoomList";
 import { Analysis } from "./components/Analysis";
 import { ImageImporter } from "./components/ImageImporter";
 import { recommend } from "./core/recommendations";
 import { detectEnvironment, getHostAdapter } from "./adapters/environment";
-import { imagesFromTransfer } from "./adapters/browserFiles";
+import {
+  imagesFromTransfer,
+  openImagePicker,
+  type ImageSource,
+} from "./adapters/browserFiles";
 export default function App() {
   const store = useBoards(),
     board = store.boards.find((b) => b.id === store.activeId),
     solver = useSolver(board);
   const [selected, setSelected] = useState<number | null>(null),
     [view, setView] = useState<BoardView>("standard"),
-    [brush, setBrush] = useState(false),
-    [tool, setTool] = useState<Brush>("gem"),
+    [editMode, setEditMode] = useState<"observe" | "flag" | "erase">("observe"),
+    [sourcePicker, setSourcePicker] = useState(false),
     [upload, setUpload] = useState<File[] | null>(null),
     [toast, setToast] = useState(""),
     [help, setHelp] = useState(false),
     [roomDraft, setRoomDraft] = useState(board?.room ?? "");
+  const fileInput = useRef<HTMLInputElement>(null),
+    cameraInput = useRef<HTMLInputElement>(null);
   const [theme, setTheme] = useState(() => {
     try {
       return (
@@ -101,24 +111,45 @@ export default function App() {
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [store.undo, store.redo, upload]);
-  const edit = (i: number, value: Brush) => {
-    if (!board) return;
-    const c = board.cells[i];
-    store.setCell(
-      board.id,
-      i,
-      value === "flag"
-        ? { ...c, flagged: !c.flagged }
-        : { ...c, observed: value },
-    );
-  };
-  const apply = (value: Brush) => {
-    setTool(value);
-    if (selected !== null) edit(selected, value);
+  const apply = (value: "gem" | number) => {
+    if (board && selected !== null)
+      store.setCell(board.id, selected, {
+        observed: value,
+        flagged: board.cells[selected].flagged,
+      });
+    setSelected(null);
   };
   const select = (i: number) => {
+    if (!board) return;
+    const c = board.cells[i];
+    if (editMode === "flag") {
+      store.setCell(board.id, i, { ...c, flagged: !c.flagged });
+      return;
+    }
+    if (editMode === "erase") {
+      store.setCell(board.id, i, { observed: "unknown", flagged: false });
+      return;
+    }
     setSelected(i);
-    if (brush) edit(i, tool);
+  };
+  const chooseSource = (source: ImageSource) => {
+    const result = openImagePicker(
+      source === "album" ? fileInput.current : cameraInput.current,
+      source,
+    );
+    setSourcePicker(false);
+    if (!result.ok) setToast(result.message);
+  };
+  const requestScreenshot = () => {
+    if (detectEnvironment().mobile) setSourcePicker(true);
+    else chooseSource("album");
+  };
+  const acceptFiles = (files: FileList | null) => {
+    const values = Array.from(files ?? []).slice(0, 20);
+    if (values.length) {
+      setSelected(null);
+      setUpload(values);
+    }
   };
   const drop = (e: DragEvent) => {
     e.preventDefault();
@@ -126,6 +157,7 @@ export default function App() {
     const fs = imagesFromTransfer(e.dataTransfer);
     if (fs.length) setUpload(fs);
   };
+
   const rec = board && solver.result ? recommend(board, solver.result) : null;
   return (
     <div
@@ -169,12 +201,12 @@ export default function App() {
           <div>
             <h2>从已知线索，找到下一颗宝石</h2>
             <p>
-              新建房间，或导入截图。点击棋盘格子，录入游戏实际显示的数字
-              0–8、宝石或安全格。数字表示周围八格中的宝石数；推测旗标不参与计算。
+              新建房间，或导入截图。点击棋盘格子，录入游戏实际显示的数字 0–8
+              或宝石。数字表示周围八格中的宝石数；推测旗标不参与计算。
             </p>
             <p>
               优先查看「必有宝石」和高概率位置；0%
-              格子确定为空。连续录入可像笔刷一样编辑。撤销支持 Ctrl / ⌘ + Z。
+              格子确定为空。旗标和擦除可用棋盘工具栏。撤销支持 Ctrl / ⌘ + Z。
             </p>
           </div>
           <button
@@ -205,7 +237,7 @@ export default function App() {
                 </div>
                 <button
                   className="primary-button upload-button"
-                  onClick={() => setUpload([])}
+                  onClick={requestScreenshot}
                 >
                   <ImagePlus size={18} />
                   <span>读取截图</span>
@@ -272,6 +304,26 @@ export default function App() {
                 </div>
                 <div className="history-buttons">
                   <button
+                    className={`icon-button ${editMode === "flag" ? "active" : ""}`}
+                    aria-label="推测旗标工具"
+                    aria-pressed={editMode === "flag"}
+                    onClick={() =>
+                      setEditMode((m) => (m === "flag" ? "observe" : "flag"))
+                    }
+                  >
+                    <Flag size={17} />
+                  </button>
+                  <button
+                    className={`icon-button ${editMode === "erase" ? "active" : ""}`}
+                    aria-label="擦除记录工具"
+                    aria-pressed={editMode === "erase"}
+                    onClick={() =>
+                      setEditMode((m) => (m === "erase" ? "observe" : "erase"))
+                    }
+                  >
+                    <Eraser size={17} />
+                  </button>
+                  <button
                     className="icon-button"
                     onClick={store.undo}
                     disabled={!store.past.length}
@@ -296,7 +348,7 @@ export default function App() {
                   selected={selected}
                   onSelect={select}
                   view={view}
-                  best={rec?.best}
+                  best={rec?.next}
                 />
                 {solver.busy && (
                   <div className="board-calculating" role="status">
@@ -307,31 +359,19 @@ export default function App() {
               <div className="board-caption">
                 <span>
                   {selected === null
-                    ? "点选格子，录入实际结果"
-                    : `已选 ${coordinate(selected, board.size)}${brush ? " · 连续录入中" : ""}`}
+                    ? editMode === "flag"
+                      ? "旗标模式：点击格子切换推测标记"
+                      : editMode === "erase"
+                        ? "擦除模式：点击格子清除记录"
+                        : "点击格子，选择宝石或 0–8"
+                    : `已选 ${coordinate(selected, board.size)}`}
                 </span>
                 <span>
                   大棋盘可左右滑动{" "}
                   <ChevronDown size={12} className="scroll-chevron" />
                 </span>
               </div>
-              <div className="board-legend">
-                <span>
-                  <i className="legend-symbol gem-symbol">◆</i>已发现宝石
-                </span>
-                <span>
-                  <i className="legend-symbol number-symbol">3</i>周围宝石数
-                </span>
-                <span>
-                  <i className="legend-symbol certain-symbol">◆</i>必有宝石
-                </span>
-                <span>
-                  <i className="legend-symbol safe-symbol">×</i>必为空
-                </span>
-                <span>
-                  <i className="legend-symbol recommend-symbol">•</i>推荐位置
-                </span>
-              </div>
+              <BoardLegend />
               <div className="board-bottom">
                 <p>
                   每次记录，都会重新推理。
@@ -363,7 +403,7 @@ export default function App() {
                 </div>
               </div>
               <div className="mobile-actions">
-                <button onClick={() => setUpload([])}>
+                <button onClick={requestScreenshot}>
                   <ImagePlus size={18} />
                   读取截图
                 </button>
@@ -373,19 +413,22 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => {
-                    if (rec?.best.length) select(rec.best[0]);
+                    if (rec?.next.length) {
+                      setEditMode("observe");
+                      setSelected(rec.next[0]);
+                    }
                   }}
-                  disabled={!rec?.best.length}
+                  disabled={!rec?.next.length}
                   className="mobile-recommend"
                 >
                   <Gem size={18} />
                   <span>
                     推荐{" "}
-                    {rec?.best.length
-                      ? coordinate(rec.best[0], board.size)
+                    {rec?.next.length
+                      ? coordinate(rec.next[0], board.size)
                       : "等待计算"}
                     <small>
-                      {rec?.best.length ? `${percent(rec.max)} 宝石概率` : ""}
+                      {rec?.next.length ? `${percent(rec.max)} 宝石概率` : ""}
                     </small>
                   </span>
                 </button>
@@ -412,16 +455,13 @@ export default function App() {
         <aside className="right-sidebar">
           {board && (
             <>
-              <Analysis board={board} {...solver} onSelect={select} />
-              <CellEditor
-                selected={selected}
-                size={board.size}
-                cell={selected === null ? undefined : board.cells[selected]}
-                onApply={apply}
-                onClose={() => setSelected(null)}
-                brush={brush}
-                onBrush={setBrush}
-                tool={tool}
+              <Analysis
+                board={board}
+                {...solver}
+                onSelect={(i) => {
+                  setEditMode("observe");
+                  setSelected(i);
+                }}
               />
             </>
           )}
@@ -452,13 +492,58 @@ export default function App() {
           </button>
         </div>
       )}
+      {board && selected !== null && (
+        <CellEditor
+          key={`${board.id}/${selected}`}
+          selected={selected}
+          size={board.size}
+          cell={board.cells[selected]}
+          onApply={apply}
+          onClose={() => setSelected(null)}
+        />
+      )}
+      {sourcePicker && (
+        <ImageSourcePicker
+          onSelect={chooseSource}
+          onClose={() => setSourcePicker(false)}
+        />
+      )}
+      <input
+        hidden
+        data-testid="screenshot-input"
+        ref={fileInput}
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(e) => {
+          acceptFiles(e.target.files);
+          e.target.value = "";
+        }}
+      />
+      <input
+        hidden
+        data-testid="camera-input"
+        ref={cameraInput}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={(e) => {
+          acceptFiles(e.target.files);
+          e.target.value = "";
+        }}
+      />
       {upload !== null && (
         <ImageImporter
           files={upload}
+          firstRoom={1}
           onClose={() => setUpload(null)}
           onImport={(b) => {
-            store.addRecognized(b);
-            setToast(`房间 ${b.room} 已导入，正在计算`);
+            const room = String(useBoards.getState().boards.length + 1);
+            store.addRecognized({ ...b, room });
+            const reviews = b.cells.filter((c) => c.recognition).length;
+            setToast(
+              `房间 ${room} 已自动填入${reviews ? `，${reviews} 格待核对，可点击修正` : ""}`,
+            );
           }}
         />
       )}

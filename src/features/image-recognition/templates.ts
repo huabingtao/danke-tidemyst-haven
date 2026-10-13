@@ -7,24 +7,25 @@ export function makeTemplates(): GlyphTemplate[] {
   const templates: GlyphTemplate[] = [];
   for (const font of ["Arial", "Verdana", "Tahoma", "Georgia", "system-ui"])
     for (const weight of ["400", "700"])
-      for (let digit = 0; digit <= 8; digit++) {
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, 64, 80);
-        ctx.fillStyle = "black";
-        ctx.font = `${weight} 54px ${font}`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(String(digit), 32, 42);
-        const pixels = ctx.getImageData(0, 0, 64, 80).data,
-          binary: number[] = [];
-        for (let i = 0; i < 64 * 80; i++)
-          binary.push(pixels[i * 4] < 128 ? 1 : 0);
-        templates.push({
-          digit,
-          font: `${weight} ${font}`,
-          mask: normalizeMask(binary, 64, 80),
-        });
-      }
+      for (const fontSize of [30, 42, 54])
+        for (let digit = 0; digit <= 8; digit++) {
+          ctx.fillStyle = "white";
+          ctx.fillRect(0, 0, 64, 80);
+          ctx.fillStyle = "black";
+          ctx.font = `${weight} ${fontSize}px ${font}`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(String(digit), 32, 42);
+          const pixels = ctx.getImageData(0, 0, 64, 80).data,
+            binary: number[] = [];
+          for (let i = 0; i < 64 * 80; i++)
+            binary.push(pixels[i * 4] < 128 ? 1 : 0);
+          templates.push({
+            digit,
+            font: `${weight} ${fontSize}px ${font}`,
+            mask: normalizeMask(binary, 64, 80),
+          });
+        }
   for (const [symbol, digit] of [
     ["✓", "safe"],
     ["✔", "safe"],

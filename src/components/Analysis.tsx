@@ -3,7 +3,6 @@ import {
   ArrowUpRight,
   CircleCheck,
   AlertTriangle,
-  Info,
   RotateCw,
 } from "lucide-react";
 import { recommend } from "../core/recommendations";
@@ -84,7 +83,7 @@ export function Analysis({
       ) : (
         <>
           <div className="recommendation">
-            <span className="recommendation-label">最可能发现宝石</span>
+            <span className="recommendation-label">推荐下一步</span>
             {rec?.best.length ? (
               <>
                 <div className="recommendation-main">
@@ -92,17 +91,36 @@ export function Analysis({
                   <span>{rec.max === 1 ? "确定有宝石" : "宝石概率"}</span>
                 </div>
                 <div className="coordinate-list">
-                  {rec.best.slice(0, 12).map((i) => (
+                  {rec.next.map((i) => (
                     <button key={i} onClick={() => onSelect(i)}>
                       {coordinate(i, board.size)}
                       <ArrowUpRight size={12} />
                     </button>
                   ))}
                 </div>
-                {rec.best.length > 12 && (
-                  <small>
-                    共 {rec.best.length} 个位置并列，以上展示前 12 个
-                  </small>
+                <p className="recommendation-reason">
+                  {rec.strategy === "certain"
+                    ? "这些格子确定有宝石，优先打开。"
+                    : rec.strategy === "exact-information"
+                      ? "最高宝石概率优先；同概率时，选择能区分更多可能布局的位置。"
+                      : "最高宝石概率优先；信息比较超出预算时，同概率选择未定邻居更多的位置。"}
+                </p>
+                {rec.best.length > rec.next.length && (
+                  <details className="alternative-details">
+                    <summary>
+                      其他同概率位置（{rec.best.length - rec.next.length}）
+                    </summary>
+                    <div className="coordinate-list">
+                      {rec.best
+                        .filter((i) => !rec.next.includes(i))
+                        .slice(0, 12)
+                        .map((i) => (
+                          <button key={i} onClick={() => onSelect(i)}>
+                            {coordinate(i, board.size)}
+                          </button>
+                        ))}
+                    </div>
+                  </details>
                 )}
               </>
             ) : (
@@ -121,22 +139,6 @@ export function Analysis({
               必为空 <b>{safe.length}</b>
             </span>
           </div>
-          <details className="information-details">
-            <summary>
-              <Info size={15} />
-              探索信息参考
-            </summary>
-            <p>
-              优先覆盖更多未定邻居的格子，属于邻域覆盖启发式；不等于精确的信息增益，也不保证获得宝石。
-            </p>
-            <div className="coordinate-list">
-              {rec?.information.map((i) => (
-                <button key={i} onClick={() => onSelect(i)}>
-                  {coordinate(i, board.size)}
-                </button>
-              ))}
-            </div>
-          </details>
           <div className="solve-status">
             <CircleCheck size={14} />
             <span>精确计算 · {result.elapsedMs.toFixed(0)} ms</span>

@@ -72,3 +72,17 @@ it("fails gracefully on flat blurry image and bounds crop", () => {
   ).toBe(100);
   expect(normalizeMask([0, 0, 0, 0], 2, 2).every((p) => p === 0)).toBe(true);
 });
+it("rejects the actual user-provided legend screenshot as a non-board", async () => {
+  const image = await loadImage(
+      readFileSync("tests/fixtures/legend-reference.png"),
+    ),
+    canvas = createCanvas(image.width, image.height),
+    ctx = canvas.getContext("2d");
+  ctx.drawImage(image, 0, 0);
+  const detection = detectGrid({
+    width: image.width,
+    height: image.height,
+    data: ctx.getImageData(0, 0, image.width, image.height).data,
+  });
+  expect(detection.confidence).toBeLessThan(0.72);
+});

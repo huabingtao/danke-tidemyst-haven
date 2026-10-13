@@ -1886,3 +1886,271 @@ progress {
   font-size: 12px;
   font-weight: 700;
 }
+/* Revision: focused cell dialog, eight complete legend states, automatic import. */
+.cell-dialog,
+.image-source-dialog,
+.automatic-import-dialog {
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin: auto;
+  padding: 22px;
+  width: min(330px, calc(100vw - 32px));
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
+}
+.cell-dialog::backdrop,
+.image-source-dialog::backdrop,
+.automatic-import-dialog::backdrop {
+  background: var(--overlay);
+}
+.cell-dialog .editor-header {
+  margin-bottom: 20px;
+}
+.cell-dialog h3 {
+  font-size: 16px;
+}
+.cell-dialog h3 span {
+  font-size: 13px;
+  color: var(--primary-ink);
+  margin-left: 8px;
+}
+.cell-dialog .editor-header small {
+  font-size: 11px;
+}
+.cell-dialog .icon-button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+.cell-dialog .number-picker {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.cell-dialog .number-picker button {
+  min-height: 52px;
+  font-size: 19px;
+}
+.gem-choice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  background: var(--gem-soft);
+  color: var(--gem);
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gem-choice:hover,
+.gem-choice.active {
+  border-color: var(--gem);
+}
+.cell-dialog .editor-note {
+  font-size: 11px;
+  margin-top: 16px;
+  text-align: center;
+}
+.recognition-hint {
+  font-size: 12px;
+  background: var(--warning-soft);
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  color: var(--warning);
+}
+.full-legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 12px;
+}
+.full-legend > span {
+  font-size: 11px;
+  line-height: 1.6;
+}
+.full-legend .legend-symbol {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  font-size: 12px;
+  border-radius: 5px;
+}
+.probability-symbol {
+  background: var(--cell);
+  color: var(--ink);
+}
+.full-legend .recommend-symbol {
+  background: var(--primary-soft);
+  border: 2px solid var(--primary);
+  color: var(--primary-ink);
+}
+.full-legend .certain-symbol {
+  border: 2px solid var(--gem);
+  background: var(--gem-soft);
+  color: var(--gem);
+}
+.full-legend .safe-symbol {
+  color: var(--danger);
+  background: color-mix(in oklch, var(--danger) 10%, var(--bg));
+}
+.flag-symbol {
+  border: 2px solid var(--warning);
+  color: var(--warning);
+  background: var(--bg);
+}
+.conflict-symbol {
+  border: 2px solid var(--danger);
+  background: color-mix(in oklch, var(--danger) 8%, var(--bg));
+  color: var(--danger);
+}
+.board-cell.best {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+.board-cell.flagged {
+  border: 2px solid var(--warning);
+}
+.board-cell.review {
+  border: 2px dashed var(--warning);
+}
+.cell-review-marker {
+  position: absolute;
+  right: 3px;
+  top: 0;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--warning);
+}
+.history-buttons .active {
+  background: var(--primary-soft);
+  color: var(--primary-ink);
+}
+.recommendation-reason {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 12px;
+}
+.alternative-details {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 14px;
+}
+.alternative-details summary {
+  cursor: pointer;
+  padding: 8px 0;
+  min-height: 32px;
+}
+.alternative-details .coordinate-list {
+  margin-top: 8px;
+}
+.automatic-import-dialog {
+  padding: 0;
+  width: min(460px, calc(100vw - 32px));
+}
+.automatic-import-dialog .dialog-header {
+  padding: 18px 20px;
+}
+.automatic-import-dialog h2 {
+  font-size: 18px;
+}
+.automatic-progress {
+  padding: 28px 26px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.automatic-progress strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.automatic-progress > span {
+  font-size: 11px;
+  color: var(--muted);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.automatic-progress p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.automatic-progress .error-text {
+  color: var(--danger);
+  margin: 0;
+}
+.automatic-progress > svg {
+  color: var(--danger);
+}
+.scan-indicator {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  background: var(--primary-soft);
+  color: var(--primary-ink);
+  border-radius: 10px;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.automatic-progress progress {
+  margin: 0;
+}
+.image-source-dialog > button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  padding: 16px;
+  min-height: 76px;
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 10px;
+  text-align: left;
+}
+.image-source-dialog > button:hover {
+  border-color: var(--primary);
+}
+.image-source-dialog > button span {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 550;
+}
+.image-source-dialog small {
+  font-weight: 400;
+  font-size: 11px;
+}
+@media (max-width: 639px) {
+  .full-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 10px;
+  }
+  .full-legend > span {
+    font-size: 10px;
+  }
+  .full-legend .legend-symbol {
+    width: 30px;
+    height: 30px;
+  }
+  .board-cell.best {
+    outline-offset: 0;
+  }
+  .cell-dialog {
+    padding: 20px;
+  }
+  .cell-dialog .number-picker button {
+    min-height: 52px;
+  }
+  .automatic-import-dialog .dialog-header {
+    padding-top: 18px;
+  }
+}
