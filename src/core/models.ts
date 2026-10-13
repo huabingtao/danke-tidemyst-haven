@@ -14,6 +14,7 @@ export interface Recommendation {
 }
 export interface Board {
   id: string;
+  roundId?: string;
   room: string;
   size: number;
   totalGems: number;
@@ -47,9 +48,12 @@ function boardId(): string {
   }
   return `room-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
+export const newRoundId = () => boardId();
 export function createBoard(size: BoardSize = 8, room = "1"): Board {
+  const id = boardId();
   return {
-    id: boardId(),
+    id,
+    roundId: id,
     size,
     room,
     totalGems: DEFAULT_GEMS[size],
@@ -75,16 +79,21 @@ export function validateBoards(input: unknown): Board[] {
     !input ||
     typeof input !== "object" ||
     !("version" in input) ||
-    input.version !== 1 ||
+    (input.version !== 1 && input.version !== 2) ||
     !("boards" in input) ||
     !Array.isArray(input.boards)
   )
-    throw new Error("不是有效的潮汐秘境 v1 数据文件");
+    throw new Error("不是有效的潮汐秘境 v1/v2 数据文件");
   if (input.boards.length > 100) throw new Error("最多支持 100 个房间");
   const ids = new Set<string>();
   return input.boards.map((value: unknown) => {
     if (!value || typeof value !== "object") throw new Error("房间数据不完整");
     const b = value as Record<string, unknown>;
+    if (
+      b.roundId !== undefined &&
+      (typeof b.roundId !== "string" || !b.roundId || b.roundId.length > 100)
+    )
+      throw new Error("局数标识无效");
     if (
       typeof b.id !== "string" ||
       !b.id ||
@@ -152,11 +161,17 @@ export function validateBoards(input: unknown): Board[] {
     });
     return {
       id: b.id,
+      roundId: typeof b.roundId === "string" ? b.roundId : b.id,
       room: b.room.trim(),
       size: b.size,
       totalGems: b.totalGems,
       cells,
-      updatedAt: Date.now(),
+      updatedAt:
+        typeof b.updatedAt === "number" &&
+        Number.isFinite(b.updatedAt) &&
+        b.updatedAt > 0
+          ? b.updatedAt
+          : Date.now(),
     };
   });
 }

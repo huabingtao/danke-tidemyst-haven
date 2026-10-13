@@ -219,7 +219,7 @@ test("JSON export import validates files", async ({ page }) => {
   await page.locator(".room-sidebar input[type=file]").setInputFiles({
     name: "invalid.json",
     mimeType: "application/json",
-    buffer: Buffer.from('{"version":2,"boards":[]}'),
+    buffer: Buffer.from('{"version":99,"boards":[]}'),
   });
   await expect(page.locator(".toast")).toContainText("不是有效");
   await page.locator(".room-sidebar input[type=file]").setInputFiles(location!);
@@ -289,7 +289,7 @@ test("actual numeric OCR runs entirely from same-origin resources", async ({
   expect(
     requests
       .filter((u) => /^https?:/.test(u))
-      .every((u) => u.startsWith("http://127.0.0.1:5173")),
+      .every((u) => new URL(u).origin === new URL(page.url()).origin),
   ).toBe(true);
 });
 test("cancel automatically-started OCR leaves the previous room intact", async ({
@@ -338,7 +338,7 @@ test("actual user game screenshot automatically fills all 64 cells correctly", a
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await testInfo.attach("recognized-real-board", {
     body: await page.evaluate(
-      () => localStorage.getItem("tidemyst-boards-v1") ?? "",
+      () => localStorage.getItem("tidemyst-boards-v2") ?? "",
     ),
     contentType: "application/json",
   });
@@ -395,7 +395,7 @@ for (const variant of [
     await expect(page.getByRole("heading", { name: "房间 2" })).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     const stored = await page.evaluate(() =>
-      JSON.parse(localStorage.getItem("tidemyst-boards-v1") ?? "{}"),
+      JSON.parse(localStorage.getItem("tidemyst-boards-v2") ?? "{}"),
     );
     const board = stored.boards.find(
       (b: { id: string }) => b.id === stored.activeId,

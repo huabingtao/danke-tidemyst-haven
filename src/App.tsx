@@ -15,7 +15,12 @@ import {
   Flag,
   Eraser,
   Share2,
+  Trophy,
 } from "lucide-react";
+import { BattlePage } from "./components/battle/BattlePage";
+import { BattleReadOnly } from "./components/battle/BattleReadOnly";
+import { useBattleLink } from "./hooks/useBattleLink";
+import { CommunityStats } from "./components/CommunityStats";
 import { useBoards } from "./stores/boards";
 import { useSharedBoard } from "./hooks/useSharedBoard";
 import { ShareDialog } from "./components/ShareDialog";
@@ -62,6 +67,8 @@ export default function App() {
     result: ShareResult;
   } | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [battles, setBattles] = useState(false);
+  const battleView = useBattleLink();
   useSharedBoard(setToast);
   const sendShare = async (kind: "progress" | "tool") => {
     if (sharing) return;
@@ -121,6 +128,7 @@ export default function App() {
   useEffect(() => {
     const handler = (e: ClipboardEvent) => {
       if (
+        battleView.active ||
         upload !== null ||
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
@@ -134,10 +142,11 @@ export default function App() {
     };
     document.addEventListener("paste", handler);
     return () => document.removeEventListener("paste", handler);
-  }, [upload]);
+  }, [upload, battleView.active]);
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (
+        battleView.active ||
         upload !== null ||
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement ||
@@ -151,7 +160,7 @@ export default function App() {
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [store.undo, store.redo, upload]);
+  }, [store.undo, store.redo, upload, battleView.active]);
   const apply = (value: "gem" | number) => {
     if (board && selected !== null && board.cells[selected])
       store.setCell(board.id, selected, {
@@ -200,6 +209,13 @@ export default function App() {
   };
 
   const rec = board && solver.result ? recommend(board, solver.result) : null;
+  if (battleView.active)
+    return (
+      <div className="app-shell">
+        <CommunityStats />
+        <BattleReadOnly share={battleView.share} error={battleView.error} />
+      </div>
+    );
   return (
     <div
       className="app-shell"
@@ -219,8 +235,20 @@ export default function App() {
         <div className="header-actions">
           <span className="privacy-badge">
             <ShieldCheck size={15} />
-            本地处理，安心使用
+            截图本地处理
           </span>
+          <button
+            className="battle-nav"
+            aria-label="我的战绩"
+            aria-pressed={battles}
+            onClick={() => {
+              setSelected(null);
+              setBattles((v) => !v);
+            }}
+          >
+            <Trophy size={20} />
+            <span>我的战绩</span>
+          </button>
           <button
             className="icon-button"
             aria-label="分享工具"
@@ -246,6 +274,7 @@ export default function App() {
           </button>
         </div>
       </header>
+      <CommunityStats />
       {help && (
         <section className="help-banner">
           <div>
@@ -268,271 +297,278 @@ export default function App() {
           </button>
         </section>
       )}
-      <div className="workspace">
-        <RoomList onMessage={setToast} />
-        <main className="board-main">
-          {board ? (
-            <>
-              <div className="board-title">
-                <div>
-                  <span className="board-context">
-                    Survivor.io · Tidemyst Haven
-                  </span>
-                  <h1>
-                    房间 {board.room}
-                    <span>
-                      {board.size}×{board.size}
-                    </span>
-                  </h1>
-                </div>
-                <button
-                  className="primary-button upload-button"
-                  onClick={requestScreenshot}
-                >
-                  <ImagePlus size={18} />
-                  <span>读取截图</span>
-                </button>
-              </div>
-              <div className="board-settings">
-                <label>
-                  房间编号
-                  <input
-                    aria-label="房间编号"
-                    maxLength={24}
-                    value={roomDraft}
-                    onChange={(e) => setRoomDraft(e.target.value)}
-                    onBlur={() => {
-                      const value = roomDraft.trim();
-                      if (value && value !== board.room)
-                        store.patch(board.id, { room: value });
-                      else setRoomDraft(board.room);
-                    }}
-                  />
-                </label>
-                <label>
-                  宝石总数
-                  <input
-                    aria-label="宝石总数"
-                    type="number"
-                    min={0}
-                    max={board.size * board.size}
-                    value={board.totalGems}
-                    onChange={(e) => {
-                      const n = Number(e.target.value);
-                      if (
-                        Number.isInteger(n) &&
-                        n >= 0 &&
-                        n <= board.size * board.size
-                      )
-                        store.patch(board.id, { totalGems: n });
-                    }}
-                  />
-                </label>
-                <span className="saved-status">
-                  <Check size={13} />
-                  自动保存
-                </span>
-              </div>
-              <div className="board-toolbar">
-                <div className="view-tabs" role="group" aria-label="棋盘视图">
-                  {(
-                    [
-                      ["standard", "标准"],
-                      ["heatmap", "热力图"],
-                      ["recommendations", "只看推荐"],
-                    ] as const
-                  ).map(([key, label]) => (
-                    <button
-                      key={key}
-                      aria-pressed={view === key}
-                      className={view === key ? "active" : ""}
-                      onClick={() => setView(key)}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                </div>
-                <div className="history-buttons">
-                  <button
-                    className="icon-button"
-                    aria-label="分享当前进度"
-                    title="分享当前进度"
-                    disabled={sharing}
-                    onClick={() => void sendShare("progress")}
-                  >
-                    <Share2 size={17} />
-                  </button>
-                  <button
-                    className={`icon-button ${editMode === "flag" ? "active" : ""}`}
-                    aria-label="推测旗标工具"
-                    aria-pressed={editMode === "flag"}
-                    onClick={() =>
-                      setEditMode((m) => (m === "flag" ? "observe" : "flag"))
-                    }
-                  >
-                    <Flag size={17} />
-                  </button>
-                  <button
-                    className={`icon-button ${editMode === "erase" ? "active" : ""}`}
-                    aria-label="擦除记录工具"
-                    aria-pressed={editMode === "erase"}
-                    onClick={() =>
-                      setEditMode((m) => (m === "erase" ? "observe" : "erase"))
-                    }
-                  >
-                    <Eraser size={17} />
-                  </button>
-                  <button
-                    className="icon-button"
-                    onClick={store.undo}
-                    disabled={!store.past.length}
-                    aria-label="撤销"
-                  >
-                    <Undo2 size={18} />
-                  </button>
-                  <button
-                    className="icon-button"
-                    onClick={store.redo}
-                    disabled={!store.future.length}
-                    aria-label="重做"
-                  >
-                    <Redo2 size={18} />
-                  </button>
-                </div>
-              </div>
-              <div className="board-surface">
-                <BoardGrid
-                  board={board}
-                  result={solver.result}
-                  selected={selected}
-                  onSelect={select}
-                  view={view}
-                  best={rec?.next}
-                />
-                {solver.busy && (
-                  <div className="board-calculating" role="status">
-                    计算中…
+      {battles ? (
+        <BattlePage
+          board={board}
+          onBack={() => setBattles(false)}
+          onMessage={setToast}
+        />
+      ) : (
+        <div className="workspace">
+          <RoomList onMessage={setToast} />
+          <main className="board-main">
+            {board ? (
+              <>
+                <div className="board-title">
+                  <div>
+                    <h1>
+                      房间 {board.room}
+                      <span>
+                        {board.size}×{board.size}
+                      </span>
+                    </h1>
                   </div>
-                )}
-              </div>
-              <div className="board-caption">
-                <span>
-                  {selected === null
-                    ? editMode === "flag"
-                      ? "旗标模式：点击格子切换推测标记"
-                      : editMode === "erase"
-                        ? "擦除模式：点击格子清除记录"
-                        : "点击格子，选择宝石或 0–8"
-                    : `已选 ${coordinate(selected, board.size)}`}
-                </span>
-                <span>棋盘随屏幕自动适配</span>
-              </div>
-              <BoardLegend />
-              <div className="board-bottom">
-                <p>
-                  每次记录，都会重新推理。
-                  <br />
-                  概率来自满足全部线索的合法布局。
-                </p>
-                <div>
                   <button
-                    className="text-button"
-                    onClick={() => {
-                      store.reset(board.id);
-                      setSelected(null);
-                      setToast("棋盘已重置，可撤销恢复");
-                    }}
+                    className="primary-button upload-button"
+                    onClick={requestScreenshot}
                   >
-                    <RotateCcw size={15} />
-                    重置
-                  </button>
-                  <button
-                    className="text-button danger"
-                    onClick={() => {
-                      store.remove(board.id);
-                      setToast("房间已删除，可撤销恢复");
-                    }}
-                  >
-                    <Trash2 size={15} />
-                    删除
+                    <ImagePlus size={18} />
+                    <span>读取截图</span>
                   </button>
                 </div>
-              </div>
-              <div className="mobile-actions">
-                <button onClick={requestScreenshot}>
-                  <ImagePlus size={18} />
-                  读取截图
-                </button>
-                <button onClick={store.undo} disabled={!store.past.length}>
-                  <Undo2 size={18} />
-                  撤销
+                <div className="board-settings">
+                  <label>
+                    房间编号
+                    <input
+                      aria-label="房间编号"
+                      maxLength={24}
+                      value={roomDraft}
+                      onChange={(e) => setRoomDraft(e.target.value)}
+                      onBlur={() => {
+                        const value = roomDraft.trim();
+                        if (value && value !== board.room)
+                          store.patch(board.id, { room: value });
+                        else setRoomDraft(board.room);
+                      }}
+                    />
+                  </label>
+                  <label>
+                    宝石总数
+                    <input
+                      aria-label="宝石总数"
+                      type="number"
+                      min={0}
+                      max={board.size * board.size}
+                      value={board.totalGems}
+                      onChange={(e) => {
+                        const n = Number(e.target.value);
+                        if (
+                          Number.isInteger(n) &&
+                          n >= 0 &&
+                          n <= board.size * board.size
+                        )
+                          store.patch(board.id, { totalGems: n });
+                      }}
+                    />
+                  </label>
+                  <span className="saved-status">
+                    <Check size={13} />
+                    自动保存
+                  </span>
+                </div>
+                <div className="board-toolbar">
+                  <div className="view-tabs" role="group" aria-label="棋盘视图">
+                    {(
+                      [
+                        ["standard", "标准"],
+                        ["heatmap", "热力图"],
+                        ["recommendations", "只看推荐"],
+                      ] as const
+                    ).map(([key, label]) => (
+                      <button
+                        key={key}
+                        aria-pressed={view === key}
+                        className={view === key ? "active" : ""}
+                        onClick={() => setView(key)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="history-buttons">
+                    <button
+                      className="icon-button"
+                      aria-label="分享当前进度"
+                      title="分享当前进度"
+                      disabled={sharing}
+                      onClick={() => void sendShare("progress")}
+                    >
+                      <Share2 size={17} />
+                    </button>
+                    <button
+                      className={`icon-button ${editMode === "flag" ? "active" : ""}`}
+                      aria-label="推测旗标工具"
+                      aria-pressed={editMode === "flag"}
+                      onClick={() =>
+                        setEditMode((m) => (m === "flag" ? "observe" : "flag"))
+                      }
+                    >
+                      <Flag size={17} />
+                    </button>
+                    <button
+                      className={`icon-button ${editMode === "erase" ? "active" : ""}`}
+                      aria-label="擦除记录工具"
+                      aria-pressed={editMode === "erase"}
+                      onClick={() =>
+                        setEditMode((m) =>
+                          m === "erase" ? "observe" : "erase",
+                        )
+                      }
+                    >
+                      <Eraser size={17} />
+                    </button>
+                    <button
+                      className="icon-button"
+                      onClick={store.undo}
+                      disabled={!store.past.length}
+                      aria-label="撤销"
+                    >
+                      <Undo2 size={18} />
+                    </button>
+                    <button
+                      className="icon-button"
+                      onClick={store.redo}
+                      disabled={!store.future.length}
+                      aria-label="重做"
+                    >
+                      <Redo2 size={18} />
+                    </button>
+                  </div>
+                </div>
+                <div className="board-surface">
+                  <BoardGrid
+                    board={board}
+                    result={solver.result}
+                    selected={selected}
+                    onSelect={select}
+                    view={view}
+                    best={rec?.next}
+                  />
+                  {solver.busy && (
+                    <div className="board-calculating" role="status">
+                      计算中…
+                    </div>
+                  )}
+                </div>
+                <div className="board-caption">
+                  <span>
+                    {selected === null
+                      ? editMode === "flag"
+                        ? "旗标模式：点击格子切换推测标记"
+                        : editMode === "erase"
+                          ? "擦除模式：点击格子清除记录"
+                          : "点击格子，选择宝石或 0–8"
+                      : `已选 ${coordinate(selected, board.size)}`}
+                  </span>
+                  <span>棋盘随屏幕自动适配</span>
+                </div>
+                <BoardLegend />
+                <div className="board-bottom">
+                  <p>
+                    每次记录，都会重新推理。
+                    <br />
+                    概率来自满足全部线索的合法布局。
+                  </p>
+                  <div>
+                    <button
+                      className="text-button"
+                      onClick={() => {
+                        store.reset(board.id);
+                        setSelected(null);
+                        setToast("棋盘已重置，可撤销恢复");
+                      }}
+                    >
+                      <RotateCcw size={15} />
+                      重置
+                    </button>
+                    <button
+                      className="text-button danger"
+                      onClick={() => {
+                        store.remove(board.id);
+                        setToast("房间已删除，可撤销恢复");
+                      }}
+                    >
+                      <Trash2 size={15} />
+                      删除
+                    </button>
+                  </div>
+                </div>
+                <div className="mobile-actions">
+                  <button onClick={requestScreenshot}>
+                    <ImagePlus size={18} />
+                    读取截图
+                  </button>
+                  <button onClick={store.undo} disabled={!store.past.length}>
+                    <Undo2 size={18} />
+                    撤销
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (rec?.next.length) {
+                        setEditMode("observe");
+                        setSelected(rec.next[0]);
+                      }
+                    }}
+                    disabled={!rec?.next.length}
+                    className="mobile-recommend"
+                  >
+                    <Gem size={18} />
+                    <span>
+                      推荐{" "}
+                      {rec?.next.length
+                        ? coordinate(rec.next[0], board.size)
+                        : "等待计算"}
+                      <small>
+                        {rec?.next.length ? `${percent(rec.max)} 宝石概率` : ""}
+                      </small>
+                    </span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="empty-workspace">
+                <Gem size={44} />
+                <h1>准备好寻找宝石了吗？</h1>
+                <p>选择尺寸创建房间，或从游戏截图开始。</p>
+                <button className="primary-button" onClick={() => store.add(8)}>
+                  创建 8×8 房间
                 </button>
                 <button
-                  onClick={() => {
-                    if (rec?.next.length) {
-                      setEditMode("observe");
-                      setSelected(rec.next[0]);
-                    }
-                  }}
-                  disabled={!rec?.next.length}
-                  className="mobile-recommend"
+                  className="secondary-button"
+                  onClick={store.undo}
+                  disabled={!store.past.length}
                 >
-                  <Gem size={18} />
-                  <span>
-                    推荐{" "}
-                    {rec?.next.length
-                      ? coordinate(rec.next[0], board.size)
-                      : "等待计算"}
-                    <small>
-                      {rec?.next.length ? `${percent(rec.max)} 宝石概率` : ""}
-                    </small>
-                  </span>
+                  撤销删除
                 </button>
               </div>
-            </>
-          ) : (
-            <div className="empty-workspace">
-              <Gem size={44} />
-              <h1>准备好寻找宝石了吗？</h1>
-              <p>选择尺寸创建房间，或从游戏截图开始。</p>
-              <button className="primary-button" onClick={() => store.add(8)}>
-                创建 8×8 房间
-              </button>
-              <button
-                className="secondary-button"
-                onClick={store.undo}
-                disabled={!store.past.length}
-              >
-                撤销删除
-              </button>
+            )}
+          </main>
+          <aside className="right-sidebar">
+            {board && (
+              <>
+                <Analysis
+                  board={board}
+                  {...solver}
+                  onSelect={(i) => {
+                    setEditMode("observe");
+                    setSelected(i);
+                  }}
+                />
+              </>
+            )}
+            <div className="local-note">
+              <ShieldCheck size={17} />
+              <p>
+                截图与棋盘内容留在此设备
+                <br />
+                {detectEnvironment().wechat
+                  ? "微信内置浏览器 · 可从相册导入"
+                  : "无需登录，打开就能用"}
+              </p>
             </div>
-          )}
-        </main>
-        <aside className="right-sidebar">
-          {board && (
-            <>
-              <Analysis
-                board={board}
-                {...solver}
-                onSelect={(i) => {
-                  setEditMode("observe");
-                  setSelected(i);
-                }}
-              />
-            </>
-          )}
-          <div className="local-note">
-            <ShieldCheck size={17} />
-            <p>
-              截图与房间数据留在此设备
-              <br />
-              {detectEnvironment().wechat
-                ? "微信内置浏览器 · 可从相册导入"
-                : "无需登录，打开就能用"}
-            </p>
-          </div>
-        </aside>
-      </div>
+          </aside>
+        </div>
+      )}
       {(toast || store.notice) && (
         <div className="toast" role="status">
           <span>{toast || store.notice}</span>
@@ -610,6 +646,7 @@ export default function App() {
           onImport={(b) => {
             const room = String(useBoards.getState().boards.length + 1);
             store.addRecognized({ ...b, room });
+            setBattles(false);
             const reviews = b.cells.filter((c) => c.recognition).length;
             setToast(
               `房间 ${room} 已自动填入${reviews ? `，${reviews} 格待核对，可点击修正` : ""}`,

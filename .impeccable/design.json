@@ -1,0 +1,742 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-13T17:24:44.449418+00:00",
+  "title": "Design System: 潮汐秘境",
+  "extensions": {
+    "colorMeta": {
+      "bg": {
+        "role": "neutral",
+        "displayName": "bg",
+        "tonalRamp": [
+          "oklch(0.1500 0.0119 259.82)",
+          "oklch(0.2643 0.0119 259.82)",
+          "oklch(0.3786 0.0119 259.82)",
+          "oklch(0.4929 0.0119 259.82)",
+          "oklch(0.6071 0.0119 259.82)",
+          "oklch(0.7214 0.0119 259.82)",
+          "oklch(0.8357 0.0119 259.82)",
+          "oklch(0.9500 0.0119 259.82)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "surface",
+        "tonalRamp": [
+          "oklch(0.1500 0.0133 97.44)",
+          "oklch(0.2643 0.0133 97.44)",
+          "oklch(0.3786 0.0133 97.44)",
+          "oklch(0.4929 0.0133 97.44)",
+          "oklch(0.6071 0.0133 97.44)",
+          "oklch(0.7214 0.0133 97.44)",
+          "oklch(0.8357 0.0133 97.44)",
+          "oklch(0.9500 0.0133 97.44)"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "surface-2",
+        "tonalRamp": [
+          "oklch(0.1500 0.0236 262.10)",
+          "oklch(0.2643 0.0236 262.10)",
+          "oklch(0.3786 0.0236 262.10)",
+          "oklch(0.4929 0.0236 262.10)",
+          "oklch(0.6071 0.0236 262.10)",
+          "oklch(0.7214 0.0236 262.10)",
+          "oklch(0.8357 0.0236 262.10)",
+          "oklch(0.9500 0.0236 262.10)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "ink",
+        "tonalRamp": [
+          "oklch(0.1500 0.0983 262.25)",
+          "oklch(0.2643 0.0983 262.25)",
+          "oklch(0.3786 0.0983 262.25)",
+          "oklch(0.4929 0.0983 262.25)",
+          "oklch(0.6071 0.0983 262.25)",
+          "oklch(0.7214 0.0983 262.25)",
+          "oklch(0.8357 0.0983 262.25)",
+          "oklch(0.9500 0.0983 262.25)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "muted",
+        "tonalRamp": [
+          "oklch(0.1500 0.0781 258.05)",
+          "oklch(0.2643 0.0781 258.05)",
+          "oklch(0.3786 0.0781 258.05)",
+          "oklch(0.4929 0.0781 258.05)",
+          "oklch(0.6071 0.0781 258.05)",
+          "oklch(0.7214 0.0781 258.05)",
+          "oklch(0.8357 0.0781 258.05)",
+          "oklch(0.9500 0.0781 258.05)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "line",
+        "tonalRamp": [
+          "oklch(0.1500 0.0556 261.21)",
+          "oklch(0.2643 0.0556 261.21)",
+          "oklch(0.3786 0.0556 261.21)",
+          "oklch(0.4929 0.0556 261.21)",
+          "oklch(0.6071 0.0556 261.21)",
+          "oklch(0.7214 0.0556 261.21)",
+          "oklch(0.8357 0.0556 261.21)",
+          "oklch(0.9500 0.0556 261.21)"
+        ]
+      },
+      "primary": {
+        "role": "primary",
+        "displayName": "primary",
+        "tonalRamp": [
+          "oklch(0.1500 0.1947 260.00)",
+          "oklch(0.2643 0.1947 260.00)",
+          "oklch(0.3786 0.1947 260.00)",
+          "oklch(0.4929 0.1947 260.00)",
+          "oklch(0.6071 0.1947 260.00)",
+          "oklch(0.7214 0.1947 260.00)",
+          "oklch(0.8357 0.1947 260.00)",
+          "oklch(0.9500 0.1947 260.00)"
+        ]
+      },
+      "primary-soft": {
+        "role": "primary",
+        "displayName": "primary-soft",
+        "tonalRamp": [
+          "oklch(0.1500 0.0246 257.65)",
+          "oklch(0.2643 0.0246 257.65)",
+          "oklch(0.3786 0.0246 257.65)",
+          "oklch(0.4929 0.0246 257.65)",
+          "oklch(0.6071 0.0246 257.65)",
+          "oklch(0.7214 0.0246 257.65)",
+          "oklch(0.8357 0.0246 257.65)",
+          "oklch(0.9500 0.0246 257.65)"
+        ]
+      },
+      "primary-ink": {
+        "role": "primary",
+        "displayName": "primary-ink",
+        "tonalRamp": [
+          "oklch(0.1500 0.1443 260.07)",
+          "oklch(0.2643 0.1443 260.07)",
+          "oklch(0.3786 0.1443 260.07)",
+          "oklch(0.4929 0.1443 260.07)",
+          "oklch(0.6071 0.1443 260.07)",
+          "oklch(0.7214 0.1443 260.07)",
+          "oklch(0.8357 0.1443 260.07)",
+          "oklch(0.9500 0.1443 260.07)"
+        ]
+      },
+      "gem": {
+        "role": "secondary",
+        "displayName": "gem",
+        "tonalRamp": [
+          "oklch(0.1500 0.0903 80.46)",
+          "oklch(0.2643 0.0903 80.46)",
+          "oklch(0.3786 0.0903 80.46)",
+          "oklch(0.4929 0.0903 80.46)",
+          "oklch(0.6071 0.0903 80.46)",
+          "oklch(0.7214 0.0903 80.46)",
+          "oklch(0.8357 0.0903 80.46)",
+          "oklch(0.9500 0.0903 80.46)"
+        ]
+      },
+      "gem-soft": {
+        "role": "secondary",
+        "displayName": "gem-soft",
+        "tonalRamp": [
+          "oklch(0.1500 0.1443 93.73)",
+          "oklch(0.2643 0.1443 93.73)",
+          "oklch(0.3786 0.1443 93.73)",
+          "oklch(0.4929 0.1443 93.73)",
+          "oklch(0.6071 0.1443 93.73)",
+          "oklch(0.7214 0.1443 93.73)",
+          "oklch(0.8357 0.1443 93.73)",
+          "oklch(0.9500 0.1443 93.73)"
+        ]
+      },
+      "danger": {
+        "role": "tertiary",
+        "displayName": "danger",
+        "tonalRamp": [
+          "oklch(0.1500 0.1948 15.33)",
+          "oklch(0.2643 0.1948 15.33)",
+          "oklch(0.3786 0.1948 15.33)",
+          "oklch(0.4929 0.1948 15.33)",
+          "oklch(0.6071 0.1948 15.33)",
+          "oklch(0.7214 0.1948 15.33)",
+          "oklch(0.8357 0.1948 15.33)",
+          "oklch(0.9500 0.1948 15.33)"
+        ]
+      },
+      "warning": {
+        "role": "tertiary",
+        "displayName": "warning",
+        "tonalRamp": [
+          "oklch(0.1500 0.1025 80.02)",
+          "oklch(0.2643 0.1025 80.02)",
+          "oklch(0.3786 0.1025 80.02)",
+          "oklch(0.4929 0.1025 80.02)",
+          "oklch(0.6071 0.1025 80.02)",
+          "oklch(0.7214 0.1025 80.02)",
+          "oklch(0.8357 0.1025 80.02)",
+          "oklch(0.9500 0.1025 80.02)"
+        ]
+      },
+      "warning-soft": {
+        "role": "tertiary",
+        "displayName": "warning-soft",
+        "tonalRamp": [
+          "oklch(0.1500 0.0827 96.51)",
+          "oklch(0.2643 0.0827 96.51)",
+          "oklch(0.3786 0.0827 96.51)",
+          "oklch(0.4929 0.0827 96.51)",
+          "oklch(0.6071 0.0827 96.51)",
+          "oklch(0.7214 0.0827 96.51)",
+          "oklch(0.8357 0.0827 96.51)",
+          "oklch(0.9500 0.0827 96.51)"
+        ]
+      },
+      "cell": {
+        "role": "neutral",
+        "displayName": "cell",
+        "tonalRamp": [
+          "oklch(0.1500 0.0339 253.71)",
+          "oklch(0.2643 0.0339 253.71)",
+          "oklch(0.3786 0.0339 253.71)",
+          "oklch(0.4929 0.0339 253.71)",
+          "oklch(0.6071 0.0339 253.71)",
+          "oklch(0.7214 0.0339 253.71)",
+          "oklch(0.8357 0.0339 253.71)",
+          "oklch(0.9500 0.0339 253.71)"
+        ]
+      },
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "dark-bg",
+        "tonalRamp": [
+          "oklch(0.1500 0.0554 258.68)",
+          "oklch(0.2643 0.0554 258.68)",
+          "oklch(0.3786 0.0554 258.68)",
+          "oklch(0.4929 0.0554 258.68)",
+          "oklch(0.6071 0.0554 258.68)",
+          "oklch(0.7214 0.0554 258.68)",
+          "oklch(0.8357 0.0554 258.68)",
+          "oklch(0.9500 0.0554 258.68)"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "dark-surface",
+        "tonalRamp": [
+          "oklch(0.1500 0.0732 257.12)",
+          "oklch(0.2643 0.0732 257.12)",
+          "oklch(0.3786 0.0732 257.12)",
+          "oklch(0.4929 0.0732 257.12)",
+          "oklch(0.6071 0.0732 257.12)",
+          "oklch(0.7214 0.0732 257.12)",
+          "oklch(0.8357 0.0732 257.12)",
+          "oklch(0.9500 0.0732 257.12)"
+        ]
+      },
+      "dark-surface-2": {
+        "role": "neutral",
+        "displayName": "dark-surface-2",
+        "tonalRamp": [
+          "oklch(0.1500 0.0868 255.50)",
+          "oklch(0.2643 0.0868 255.50)",
+          "oklch(0.3786 0.0868 255.50)",
+          "oklch(0.4929 0.0868 255.50)",
+          "oklch(0.6071 0.0868 255.50)",
+          "oklch(0.7214 0.0868 255.50)",
+          "oklch(0.8357 0.0868 255.50)",
+          "oklch(0.9500 0.0868 255.50)"
+        ]
+      },
+      "dark-ink": {
+        "role": "neutral",
+        "displayName": "dark-ink",
+        "tonalRamp": [
+          "oklch(0.1500 0.0136 258.34)",
+          "oklch(0.2643 0.0136 258.34)",
+          "oklch(0.3786 0.0136 258.34)",
+          "oklch(0.4929 0.0136 258.34)",
+          "oklch(0.6071 0.0136 258.34)",
+          "oklch(0.7214 0.0136 258.34)",
+          "oklch(0.8357 0.0136 258.34)",
+          "oklch(0.9500 0.0136 258.34)"
+        ]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "dark-muted",
+        "tonalRamp": [
+          "oklch(0.1500 0.0528 260.03)",
+          "oklch(0.2643 0.0528 260.03)",
+          "oklch(0.3786 0.0528 260.03)",
+          "oklch(0.4929 0.0528 260.03)",
+          "oklch(0.6071 0.0528 260.03)",
+          "oklch(0.7214 0.0528 260.03)",
+          "oklch(0.8357 0.0528 260.03)",
+          "oklch(0.9500 0.0528 260.03)"
+        ]
+      },
+      "dark-line": {
+        "role": "neutral",
+        "displayName": "dark-line",
+        "tonalRamp": [
+          "oklch(0.1500 0.0974 258.11)",
+          "oklch(0.2643 0.0974 258.11)",
+          "oklch(0.3786 0.0974 258.11)",
+          "oklch(0.4929 0.0974 258.11)",
+          "oklch(0.6071 0.0974 258.11)",
+          "oklch(0.7214 0.0974 258.11)",
+          "oklch(0.8357 0.0974 258.11)",
+          "oklch(0.9500 0.0974 258.11)"
+        ]
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "dark-primary",
+        "tonalRamp": [
+          "oklch(0.1500 0.1131 259.28)",
+          "oklch(0.2643 0.1131 259.28)",
+          "oklch(0.3786 0.1131 259.28)",
+          "oklch(0.4929 0.1131 259.28)",
+          "oklch(0.6071 0.1131 259.28)",
+          "oklch(0.7214 0.1131 259.28)",
+          "oklch(0.8357 0.1131 259.28)",
+          "oklch(0.9500 0.1131 259.28)"
+        ]
+      },
+      "dark-primary-soft": {
+        "role": "primary",
+        "displayName": "dark-primary-soft",
+        "tonalRamp": [
+          "oklch(0.1500 0.1003 258.26)",
+          "oklch(0.2643 0.1003 258.26)",
+          "oklch(0.3786 0.1003 258.26)",
+          "oklch(0.4929 0.1003 258.26)",
+          "oklch(0.6071 0.1003 258.26)",
+          "oklch(0.7214 0.1003 258.26)",
+          "oklch(0.8357 0.1003 258.26)",
+          "oklch(0.9500 0.1003 258.26)"
+        ]
+      },
+      "dark-primary-ink": {
+        "role": "primary",
+        "displayName": "dark-primary-ink",
+        "tonalRamp": [
+          "oklch(0.1500 0.0682 257.35)",
+          "oklch(0.2643 0.0682 257.35)",
+          "oklch(0.3786 0.0682 257.35)",
+          "oklch(0.4929 0.0682 257.35)",
+          "oklch(0.6071 0.0682 257.35)",
+          "oklch(0.7214 0.0682 257.35)",
+          "oklch(0.8357 0.0682 257.35)",
+          "oklch(0.9500 0.0682 257.35)"
+        ]
+      },
+      "dark-gem": {
+        "role": "secondary",
+        "displayName": "dark-gem",
+        "tonalRamp": [
+          "oklch(0.1500 0.1348 93.48)",
+          "oklch(0.2643 0.1348 93.48)",
+          "oklch(0.3786 0.1348 93.48)",
+          "oklch(0.4929 0.1348 93.48)",
+          "oklch(0.6071 0.1348 93.48)",
+          "oklch(0.7214 0.1348 93.48)",
+          "oklch(0.8357 0.1348 93.48)",
+          "oklch(0.9500 0.1348 93.48)"
+        ]
+      },
+      "dark-gem-soft": {
+        "role": "secondary",
+        "displayName": "dark-gem-soft",
+        "tonalRamp": [
+          "oklch(0.1500 0.0747 86.39)",
+          "oklch(0.2643 0.0747 86.39)",
+          "oklch(0.3786 0.0747 86.39)",
+          "oklch(0.4929 0.0747 86.39)",
+          "oklch(0.6071 0.0747 86.39)",
+          "oklch(0.7214 0.0747 86.39)",
+          "oklch(0.8357 0.0747 86.39)",
+          "oklch(0.9500 0.0747 86.39)"
+        ]
+      },
+      "dark-danger": {
+        "role": "tertiary",
+        "displayName": "dark-danger",
+        "tonalRamp": [
+          "oklch(0.1500 0.1399 9.82)",
+          "oklch(0.2643 0.1399 9.82)",
+          "oklch(0.3786 0.1399 9.82)",
+          "oklch(0.4929 0.1399 9.82)",
+          "oklch(0.6071 0.1399 9.82)",
+          "oklch(0.7214 0.1399 9.82)",
+          "oklch(0.8357 0.1399 9.82)",
+          "oklch(0.9500 0.1399 9.82)"
+        ]
+      },
+      "dark-warning": {
+        "role": "tertiary",
+        "displayName": "dark-warning",
+        "tonalRamp": [
+          "oklch(0.1500 0.1357 91.05)",
+          "oklch(0.2643 0.1357 91.05)",
+          "oklch(0.3786 0.1357 91.05)",
+          "oklch(0.4929 0.1357 91.05)",
+          "oklch(0.6071 0.1357 91.05)",
+          "oklch(0.7214 0.1357 91.05)",
+          "oklch(0.8357 0.1357 91.05)",
+          "oklch(0.9500 0.1357 91.05)"
+        ]
+      },
+      "dark-warning-soft": {
+        "role": "tertiary",
+        "displayName": "dark-warning-soft",
+        "tonalRamp": [
+          "oklch(0.1500 0.0659 85.51)",
+          "oklch(0.2643 0.0659 85.51)",
+          "oklch(0.3786 0.0659 85.51)",
+          "oklch(0.4929 0.0659 85.51)",
+          "oklch(0.6071 0.0659 85.51)",
+          "oklch(0.7214 0.0659 85.51)",
+          "oklch(0.8357 0.0659 85.51)",
+          "oklch(0.9500 0.0659 85.51)"
+        ]
+      },
+      "dark-cell": {
+        "role": "neutral",
+        "displayName": "dark-cell",
+        "tonalRamp": [
+          "oklch(0.1500 0.0893 255.13)",
+          "oklch(0.2643 0.0893 255.13)",
+          "oklch(0.3786 0.0893 255.13)",
+          "oklch(0.4929 0.0893 255.13)",
+          "oklch(0.6071 0.0893 255.13)",
+          "oklch(0.7214 0.0893 255.13)",
+          "oklch(0.8357 0.0893 255.13)",
+          "oklch(0.9500 0.0893 255.13)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "white",
+        "tonalRamp": [
+          "oklch(0.1500 0.0000 89.88)",
+          "oklch(0.2643 0.0000 89.88)",
+          "oklch(0.3786 0.0000 89.88)",
+          "oklch(0.4929 0.0000 89.88)",
+          "oklch(0.6071 0.0000 89.88)",
+          "oklch(0.7214 0.0000 89.88)",
+          "oklch(0.8357 0.0000 89.88)",
+          "oklch(0.9500 0.0000 89.88)"
+        ]
+      },
+      "overlay": {
+        "role": "neutral",
+        "displayName": "overlay",
+        "tonalRamp": [
+          "oklch(0.1500 0.0784 259.72)",
+          "oklch(0.2643 0.0784 259.72)",
+          "oklch(0.3786 0.0784 259.72)",
+          "oklch(0.4929 0.0784 259.72)",
+          "oklch(0.6071 0.0784 259.72)",
+          "oklch(0.7214 0.0784 259.72)",
+          "oklch(0.8357 0.0784 259.72)",
+          "oklch(0.9500 0.0784 259.72)"
+        ]
+      },
+      "yellow": {
+        "role": "secondary",
+        "displayName": "yellow",
+        "tonalRamp": [
+          "oklch(0.1500 0.1681 88.31)",
+          "oklch(0.2643 0.1681 88.31)",
+          "oklch(0.3786 0.1681 88.31)",
+          "oklch(0.4929 0.1681 88.31)",
+          "oklch(0.6071 0.1681 88.31)",
+          "oklch(0.7214 0.1681 88.31)",
+          "oklch(0.8357 0.1681 88.31)",
+          "oklch(0.9500 0.1681 88.31)"
+        ]
+      },
+      "ocean": {
+        "role": "primary",
+        "displayName": "ocean",
+        "tonalRamp": [
+          "oklch(0.1500 0.1947 260.00)",
+          "oklch(0.2643 0.1947 260.00)",
+          "oklch(0.3786 0.1947 260.00)",
+          "oklch(0.4929 0.1947 260.00)",
+          "oklch(0.6071 0.1947 260.00)",
+          "oklch(0.7214 0.1947 260.00)",
+          "oklch(0.8357 0.1947 260.00)",
+          "oklch(0.9500 0.1947 260.00)"
+        ]
+      },
+      "navy-fixed": {
+        "role": "neutral",
+        "displayName": "navy-fixed",
+        "tonalRamp": [
+          "oklch(0.1500 0.0983 262.25)",
+          "oklch(0.2643 0.0983 262.25)",
+          "oklch(0.3786 0.0983 262.25)",
+          "oklch(0.4929 0.0983 262.25)",
+          "oklch(0.6071 0.0983 262.25)",
+          "oklch(0.7214 0.0983 262.25)",
+          "oklch(0.8357 0.0983 262.25)",
+          "oklch(0.9500 0.0983 262.25)"
+        ]
+      },
+      "gold-stroke": {
+        "role": "secondary",
+        "displayName": "gold-stroke",
+        "tonalRamp": [
+          "oklch(0.1500 0.1417 86.49)",
+          "oklch(0.2643 0.1417 86.49)",
+          "oklch(0.3786 0.1417 86.49)",
+          "oklch(0.4929 0.1417 86.49)",
+          "oklch(0.6071 0.1417 86.49)",
+          "oklch(0.7214 0.1417 86.49)",
+          "oklch(0.8357 0.1417 86.49)",
+          "oklch(0.9500 0.1417 86.49)"
+        ]
+      },
+      "poster-paper": {
+        "role": "neutral",
+        "displayName": "poster-paper",
+        "tonalRamp": [
+          "oklch(0.1500 0.0245 91.61)",
+          "oklch(0.2643 0.0245 91.61)",
+          "oklch(0.3786 0.0245 91.61)",
+          "oklch(0.4929 0.0245 91.61)",
+          "oklch(0.6071 0.0245 91.61)",
+          "oklch(0.7214 0.0245 91.61)",
+          "oklch(0.8357 0.0245 91.61)",
+          "oklch(0.9500 0.0245 91.61)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "display",
+        "purpose": "战绩页主标题。"
+      },
+      "headline": {
+        "displayName": "headline",
+        "purpose": "棋盘标题。"
+      },
+      "title": {
+        "displayName": "title",
+        "purpose": "战绩区域标题。"
+      },
+      "body": {
+        "displayName": "body",
+        "purpose": "默认正文与段落。"
+      },
+      "label": {
+        "displayName": "label",
+        "purpose": "主要动作。"
+      },
+      "metric": {
+        "displayName": "metric",
+        "purpose": "当前战绩大数值。"
+      },
+      "supporting": {
+        "displayName": "supporting",
+        "purpose": "辅助说明。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "button-inset",
+        "value": "inset 0 -3px 3px #b58a1529",
+        "purpose": "主要按钮的轻内嵌深度。"
+      },
+      {
+        "name": "cell-inset",
+        "value": "inset 0 -2px 0 #112b5f10",
+        "purpose": "棋格的轻内嵌深度。"
+      },
+      {
+        "name": "toast",
+        "value": "0 2px 8px oklch(0.1 0 0 / 0.18)",
+        "purpose": "通知浮层。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-color",
+        "value": "background 0.15s, color 0.15s, border-color 0.15s",
+        "purpose": "按钮状态过渡。"
+      },
+      {
+        "name": "loading-pulse",
+        "value": "pulse 1.5s ease-in-out infinite",
+        "purpose": "加载占位。"
+      },
+      {
+        "name": "scan-pulse",
+        "value": "pulse 1.6s ease-in-out infinite",
+        "purpose": "自动识别扫描提示。"
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none !important; transition: none !important; scroll-behavior: auto !important",
+        "purpose": "prefers-reduced-motion: reduce 时关闭运动。"
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow-board",
+        "value": "359px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "639px"
+      },
+      {
+        "name": "tablet-max",
+        "value": "959px"
+      },
+      {
+        "name": "compact-desktop-max",
+        "value": "1199px"
+      },
+      {
+        "name": "wide-desktop-min",
+        "value": "1600px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "金黄主要按钮",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "核心动作，44px 最小触摸目标。",
+      "html": "<button class=\"ds-primary\">结束本局</button>",
+      "css": ".ds-primary{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;min-height:44px;padding:10px 15px;border-radius:8px;background:var(--yellow,#ffca28);color:#112b5f;border:2px solid #c99b15;font-size:14px;font-weight:850;box-shadow:inset 0 -3px 3px #b58a1529;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}.ds-primary:hover:not(:disabled){filter:brightness(1.08)}.ds-primary:focus-visible{outline:2px solid var(--primary,#1762d8);outline-offset:3px;}.ds-primary:disabled{opacity:.4;cursor:not-allowed}"
+    },
+    {
+      "name": "次级按钮",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "主题色面与描边承托辅助操作。",
+      "html": "<button class=\"ds-secondary\">下载图片</button>",
+      "css": ".ds-secondary{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;min-height:44px;padding:10px 15px;border-radius:8px;background:var(--bg,#f2f7ff);color:var(--ink,#112b5f);border:2px solid var(--line,#b4c9ed);font-size:14px;font-weight:750;cursor:pointer;transition:background .15s,color .15s,border-color .15s}.ds-secondary:hover:not(:disabled){background:var(--surface,#fffdf3)}.ds-secondary:focus-visible{outline:2px solid var(--primary,#1762d8);outline-offset:3px;}.ds-secondary:disabled{opacity:.4;cursor:not-allowed}"
+    },
+    {
+      "name": "文字按钮",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "低强调的复制和返回操作。",
+      "html": "<button class=\"ds-text\">复制战绩链接</button>",
+      "css": ".ds-text{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;min-height:44px;padding:6px 10px;border:0;border-radius:6px;background:transparent;color:var(--muted,#405d88);font-size:13px;cursor:pointer;transition:background .15s,color .15s}.ds-text:hover{background:var(--surface-2,#e6efff);color:var(--ink,#112b5f)}.ds-text:focus-visible{outline:2px solid var(--primary,#1762d8);outline-offset:3px;}"
+    },
+    {
+      "name": "主题输入",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "默认文本与数字字段。",
+      "html": "<label class=\"ds-field\">宝石总数 <input value=\"20\" aria-label=\"宝石总数\"></label>",
+      "css": ".ds-field{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;font-size:12px;color:var(--muted,#405d88)}.ds-field input{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;min-height:40px;width:120px;padding:7px 10px;border:1px solid var(--line,#b4c9ed);border-radius:7px;background:var(--bg,#f2f7ff);color:var(--ink,#112b5f);caret-color:var(--primary,#1762d8)}.ds-field input:focus-visible{outline:2px solid var(--primary,#1762d8);outline-offset:3px;}"
+    },
+    {
+      "name": "战绩入口",
+      "kind": "nav",
+      "refersTo": "battle-navigation",
+      "description": "金黄入口在海蓝顶栏中提供识别。",
+      "html": "<a class=\"ds-nav\" href=\"#battle\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M8 21h8m-4-4v4M7 4h10v5a5 5 0 0 1-10 0V4Zm0 1H4v3a4 4 0 0 0 4 4m9-7h3v3a4 4 0 0 1-4 4\"/></svg>我的战绩</a>",
+      "css": ".ds-nav{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:8px 14px;border-radius:9px;background:var(--yellow,#ffca28);color:#112b5f;border:2px solid #ffec9b;font-weight:800;text-decoration:none}.ds-nav:focus-visible{outline:2px solid var(--primary,#1762d8);outline-offset:3px;}"
+    },
+    {
+      "name": "视图标签",
+      "kind": "nav",
+      "refersTo": "view-tab-active",
+      "description": "海蓝白字明确标识当前视图。",
+      "html": "<div class=\"ds-tabs\"><button class=\"ds-tab ds-active\" aria-pressed=\"true\">标准视图</button><button class=\"ds-tab\" aria-pressed=\"false\">概率热图</button></div>",
+      "css": ".ds-tabs{display:inline-flex;gap:2px;padding:4px;border-radius:8px;background:var(--surface-2,#e6efff)}.ds-tab{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;min-height:40px;padding:7px 14px;border:0;border-radius:5px;background:transparent;color:var(--muted,#405d88);font-size:12px;cursor:pointer;transition:background .15s,color .15s}.ds-tab.ds-active{background:var(--ocean,#1762d8);color:white;font-weight:600}.ds-tab:focus-visible{outline:2px solid var(--primary,#1762d8);outline-offset:3px;}"
+    },
+    {
+      "name": "战绩状态",
+      "kind": "chip",
+      "refersTo": "battle-status",
+      "description": "非操作状态说明，与房间标题并列。",
+      "html": "<span class=\"ds-status\">已结算</span>",
+      "css": ".ds-status{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;display:inline-block;background:var(--yellow,#ffca28);color:#112b5f;border-radius:6px;padding:5px 9px;font-size:12px;font-weight:800}"
+    },
+    {
+      "name": "当前战绩容器",
+      "kind": "card",
+      "refersTo": "battle-card",
+      "description": "蓝色描边、主题色面、大数值与辅助单位。",
+      "html": "<section class=\"ds-card\"><h2>房间 1</h2><p>花费棋子</p><strong>28 <small>枚</small></strong></section>",
+      "css": ".ds-card{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;background:var(--surface,#fffdf3);color:var(--ink,#112b5f);border:2px solid var(--primary,#1762d8);border-radius:14px;padding:24px}.ds-card h2{margin:0;font-size:20px;font-weight:850}.ds-card p{margin:22px 0 9px;color:var(--muted,#405d88);font-size:13px}.ds-card strong{color:var(--primary-ink,#17499b);font-size:38px;line-height:1.15;font-weight:900;font-variant-numeric:tabular-nums}.ds-card small{font-size:16px;font-weight:600;color:var(--muted,#405d88)}"
+    },
+    {
+      "name": "语义棋格",
+      "kind": "custom",
+      "refersTo": "board-cell",
+      "description": "未知、数字、宝石与推荐共用方格语法。",
+      "html": "<div class=\"ds-grid\"><button class=\"ds-cell\" aria-label=\"A1 宝石概率 57%\">57%</button><button class=\"ds-cell ds-number\" aria-label=\"B1 数字 3\">3</button><button class=\"ds-cell ds-gem\" aria-label=\"C1 已发现宝石\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"m6 3-5 6 11 13L23 9l-5-6H6Zm-5 6h22M6 3l6 19 6-19\"/></svg></button><button class=\"ds-cell ds-best\" aria-label=\"D1 推荐，宝石概率 35%\">35%</button></div>",
+      "css": ".ds-grid{display:grid;grid-template-columns:repeat(4,52px);gap:5px}.ds-cell{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;aspect-ratio:1;min-width:0;min-height:0;padding:0;border:1px solid transparent;border-radius:6px;background:var(--cell,#d9eaff);color:var(--ink,#112b5f);display:grid;place-items:center;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums;box-shadow:inset 0 -2px 0 #112b5f10;cursor:pointer;outline-offset:-3px;transition:background .15s,color .15s,border-color .15s}.ds-cell:hover{border-color:var(--primary,#1762d8)}.ds-cell:focus-visible{outline:2px solid var(--primary,#1762d8)}.ds-number{background:var(--surface,#fffdf3);color:var(--primary-ink,#17499b);border-color:var(--line,#b4c9ed);font-size:22px}.ds-gem{background:var(--gem-soft,#ffdd63);color:var(--gem,#6b4b00)}.ds-best{background:var(--yellow,#ffca28);color:#112b5f;outline:2px solid var(--primary,#1762d8);outline-offset:1px;border-color:var(--primary,#1762d8)}"
+    },
+    {
+      "name": "选中房间",
+      "kind": "nav",
+      "refersTo": "room-navigation-active",
+      "description": "固定海蓝承托当前房间，白字与浅金黄辅助数。",
+      "html": "<button class=\"ds-room\" aria-pressed=\"true\"><span><strong>房间 1</strong><small>8 × 8 · 进行中</small></span><b>5 / 20</b></button>",
+      "css": ".ds-room{font-family:\"Nunito Variable\",\"PingFang SC\",\"Microsoft YaHei\",-apple-system,sans-serif;display:flex;align-items:center;gap:10px;width:220px;min-height:72px;padding:12px 10px;border:1px solid var(--ocean,#1762d8);border-radius:10px;background:var(--ocean,#1762d8);color:white;text-align:left;cursor:pointer;transition:background .15s,color .15s,border-color .15s}.ds-room strong{display:block;font-size:14px;font-weight:600}.ds-room small{display:block;margin-top:6px;font-size:11px;color:#fff0a0}.ds-room b{margin-left:auto;color:#fff0a0;font-size:15px;font-weight:400;font-variant-numeric:tabular-nums}.ds-room:hover{background:var(--ocean,#1762d8)}.ds-room:focus-visible{outline:2px solid var(--primary,#1762d8);outline-offset:3px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "海蓝棋盘与金黄战绩册",
+    "overview": "原创探索奖励册：海蓝承托操作框架，金黄承托宝石、核心动作和收获，冷浅蓝页面让密集棋盘保持清晰。深色主题沿用相同语义，切换为深海蓝底与明亮文字；顶栏和金黄动作保留身份色。\n\n清晰、可信、轻快的中文本地工具以事实和推测的视觉区分为基础。圆角、几何宝石标记、粗数字和少量内嵌深度形成游戏气质；棋盘与分析保持紧凑，战绩页用更大的数字表达数量与比例。视觉不依赖游戏截图或真实金属、纸张纹理。",
+    "keyCharacteristics": [
+      "海蓝操作框架与金黄结果强调。",
+      "Nunito 数字与平台中文字体，数值优先。",
+      "全列自适应棋盘与完整八状态图例。",
+      "浅深主题、键盘焦点、触摸与减少动画兼容。",
+      "固定战绩图片与只读链接共享同一快照。"
+    ],
+    "rules": [
+      {
+        "name": "The Semantic Pair Rule",
+        "body": "每种棋盘颜色必须同时具有数字、文字、符号或边框状态；已录入事实、推测旗标、精确概率与识别待核对状态保持可辨。",
+        "section": "colors"
+      },
+      {
+        "name": "The Number First Rule",
+        "body": "数量和比例使用清晰粗数字与等宽数字特性；单位退居辅助层，不以装饰文字抢占数字层级。",
+        "section": "typography"
+      },
+      {
+        "name": "The Inset Depth Rule",
+        "body": "主要按钮与棋格使用轻内嵌深度；工作面靠描边和色面区分，浮层只使用柔和阴影。",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do 保留全列棋盘，按实际容器宽度同时缩放格子、坐标轴、间距和数值。",
+      "Do 在八状态图例、棋格和分析中保持同一语义，并明确事实与推测。",
+      "Do 为独立操作保留至少 44px 的主要触摸目标；密集棋格通过状态编辑弹窗提供大按钮。",
+      "Do 使用主题语义变量，并保留可见键盘焦点、原生弹窗与减少动画设置。",
+      "Do 在导出战绩中保留四项数量／比例、统计依据与二维码；图片及链接保持同一固定快照。"
+    ],
+    "donts": [
+      "Don't 把棋盘放入内部横向滚动容器或隐藏窄屏列。",
+      "Don't 只靠颜色表达宝石、推荐、矛盾或待核对状态。",
+      "Don't 将推断和旗标包装成已发现宝石或已消耗棋子。",
+      "Don't 引入游戏截图、参考图复制、真实金属或纸张纹理作为品牌材料。",
+      "Don't 将棋格中遗留的字体图形作为新界面的图标规范；新图标沿用现有内联 SVG。"
+    ]
+  }
+}

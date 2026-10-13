@@ -46,3 +46,11 @@ flowchart LR
 前端主包、求解 worker、图像 worker 分别打包；OCR 资源只在数字模板不确定时按需加载。public OCR 分发资源约 60MB，但浏览器只选择兼容的一个核心和一个语言模型，不会下载整个目录。最多 20 张待处理图片，逐张解码，工作图最大边 1600px；输入限制 30MB 和 2000 万像素，PNG/JPEG 先检查头部尺寸。
 
 不保存原图到 localStorage，不使用跨域 Cookie，不发送图片到网络。OCR 模型读取是同源静态 GET；没有图片上传请求。
+
+## 战绩和匿名统计（2026-10-14）
+
+Board.roundId 将一局与可复用的房间区分。`features/battle/stats.ts` 是纯计算/校验模块；最终记录与棋盘分别保存，结束本局按 roundId upsert，整盘重置产生新 roundId。v2 JSON 包含 boards/activeId/records，最多 1000 条最终记录。自动存储键 `tidemyst-boards-v2`，首次读取并迁移 v1；原 v1 键保留供回滚，不再持续同步。
+
+`links.ts` 单独编码 #battle 只读摘要，不与原 #progress 的导入路径混用。`poster.ts` Canvas 生成 1080×1440 PNG，qrcode 生成真实二维码；字体随 npm 打包，无远程图片生成服务。UI 路由监听 hash，只读页不写棋盘；图片分享由独立 adapter 提供取消与下载降级。
+
+CommunityStats 仅在可见页面发送匿名心跳。匿名浏览器 ID 保存在 localStorage，多标签复用；30 秒心跳、90 秒过期，关闭/隐藏后自然离线。`communityStats.ts` 维护有限的离线完成队列，收到服务确认才移除。Node 内置 SQLite 服务只接收 clientId/roundId，数据库存两者联合 SHA-256 和完成时间，不保存截图、棋盘、昵称或战绩比例。唯一键保证重试和重新结算不增加局数。线上 systemd 常驻，Nginx 同源代理；普通静态站无服务时显示不可用并保持本地功能。

@@ -43,9 +43,10 @@ it("handles empty persisted collection and corrupted data", async () => {
     "tidemyst-boards-v1",
     JSON.stringify({ version: 1, boards: [], activeId: "" }),
   );
-  const { useBoards } = await import("../../src/stores/boards");
+  const { useBoards, STORAGE_KEY } = await import("../../src/stores/boards");
   expect(useBoards.getState().boards).toHaveLength(0);
   vi.resetModules();
+  memory.delete(STORAGE_KEY);
   memory.set("tidemyst-boards-v1", "broken");
   const broken = await import("../../src/stores/boards");
   expect(broken.useBoards.getState().notice).toContain("无法读取");

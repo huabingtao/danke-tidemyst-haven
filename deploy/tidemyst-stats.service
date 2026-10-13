@@ -1,0 +1,23 @@
+[Unit]
+Description=Tidemyst Haven anonymous community statistics
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+ExecStart=/usr/bin/node /opt/tidemyst-stats/current/stats.mjs
+Environment=PORT=3009
+Environment=DATABASE_PATH=/var/lib/tidemyst-stats/stats.sqlite
+StateDirectory=tidemyst-stats
+StateDirectoryMode=0750
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/tidemyst-stats
+
+[Install]
+WantedBy=multi-user.target

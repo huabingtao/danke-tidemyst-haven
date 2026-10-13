@@ -5,6 +5,20 @@ export default defineConfig({
   base: "./",
   plugins: [react(), tailwind()],
   test: { include: ["tests/**/*.test.ts"] },
-  server: { port: 5173 },
+  server: {
+    port: 5173,
+    watch: {
+      ignored: [
+        "**/.impeccable/**",
+        "**/docs/**",
+        "**/*.md",
+        "**/test-results/**",
+        "**/playwright-report/**",
+      ],
+    },
+    proxy: {
+      "/api/stats": { target: "http://127.0.0.1:3009", changeOrigin: false },
+    },
+  },
   worker: { format: "es" },
 });

@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import { useBoards, exportData } from "../stores/boards";
 import { downloadJson } from "../adapters/environment";
 import type { BoardSize } from "../core/models";
+import { boardStats } from "../features/battle/stats";
 export function RoomList({ onMessage }: { onMessage: (s: string) => void }) {
   const store = useBoards(),
     [size, setSize] = useState<BoardSize>(8),
@@ -20,11 +21,11 @@ export function RoomList({ onMessage }: { onMessage: (s: string) => void }) {
     }
   };
   const exportFile = () => {
-    if (!store.boards.length) {
+    if (!store.boards.length && !store.records.length) {
       onMessage("请先创建一个房间");
       return;
     }
-    downloadJson(exportData(store.boards, store.activeId));
+    downloadJson(exportData(store.boards, store.activeId, store.records));
     onMessage("已生成 JSON 备份；微信中若下载受限，可在普通浏览器保存。");
   };
   return (
@@ -35,8 +36,7 @@ export function RoomList({ onMessage }: { onMessage: (s: string) => void }) {
       </div>
       <div className="room-list">
         {store.boards.map((b) => {
-          const found = b.cells.filter((c) => c.observed === "gem").length,
-            opened = b.cells.filter((c) => c.observed !== "unknown").length;
+          const { found, spent: opened } = boardStats(b);
           return (
             <button
               key={b.id}
