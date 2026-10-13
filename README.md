@@ -2,6 +2,8 @@
 
 独立中文 H5：手动录入或从截图读取棋盘，按真实数字和宝石总数推算每格宝石概率。纯前端，本地处理，无登录、后端或付费 AI API。
 
+正式入口：[dankecxmj.guaguahub.cn](https://dankecxmj.guaguahub.cn/)。已部署腾讯云 Nginx，HTTPS 证书自动续期；更新和回滚见 [部署记录](docs/DEPLOYMENT.md)。
+
 ## 本地启动
 
 需要 Node.js 22.12+（本次验证为 Node 24.11.1）。
@@ -65,4 +67,5 @@ Vite 使用相对 base，可部署到域名根目录或 `/tidemyst/` 子目录�
 - [图片识别](docs/IMAGE_RECOGNITION.md)
 - [微信 WebView 接入准备](docs/WECHAT_WEBVIEW.md)
 - [分享链接与微信接入](docs/SHARING.md)
+- [腾讯云部署记录](docs/DEPLOYMENT.md)
 - [验收记录](docs/ACCEPTANCE.md)
