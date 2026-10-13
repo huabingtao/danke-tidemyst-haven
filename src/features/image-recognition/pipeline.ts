@@ -9,6 +9,7 @@ import {
   type GlyphTemplate,
   type RecognitionCell,
 } from "./pixels";
+import { gameFeatures } from "./gameBoard";
 import { imageDimensions } from "./dimensions";
 export interface RecognitionProgress {
   progress: number;
@@ -21,6 +22,7 @@ export interface RecognitionRequest {
   templates: GlyphTemplate[];
   ocr: boolean;
   assetBase: string;
+  profile?: "tidemyst";
 }
 export async function recognizeCells(
   request: RecognitionRequest,
@@ -42,11 +44,14 @@ export async function recognizeCells(
     for (let i = 0; i < size * size; i++) {
       ensureActive();
       const crop = cropPixels(image, cellRect(rect, size, i));
-      let recognized = classifyCell(crop, templates);
-      const f = features(crop);
+      let recognized = classifyCell(crop, templates, request.profile);
+      const f =
+        request.profile === "tidemyst" ? gameFeatures(crop) : features(crop);
       if (
         request.ocr &&
-        recognized.cell.observed === "unknown" &&
+        recognized.needsReview &&
+        (recognized.cell.observed === "unknown" ||
+          request.profile === "tidemyst") &&
         f.foreground >= 0.012 &&
         f.foreground < 0.55 &&
         !ocrFailed
@@ -111,13 +116,21 @@ export async function recognizeCells(
           ensureActive();
           const digit = output.data.text.trim(),
             confidence = output.data.confidence / 100;
-          if (/^[0-8]$/.test(digit) && confidence >= 0.8)
+          if (/^[0-8]$/.test(digit) && confidence >= 0.8) {
+            const agreement =
+              request.profile === "tidemyst" &&
+              typeof recognized.cell.observed === "number" &&
+              recognized.cell.observed === Number(digit) &&
+              recognized.confidence >= 0.84;
             recognized = {
               cell: { observed: Number(digit), flagged: false },
-              confidence,
-              reason: "OCR 数字候选，请核对原图",
-              needsReview: true,
+              confidence: agreement ? Math.max(0.91, confidence) : confidence,
+              reason: agreement
+                ? "游戏字形模板与 OCR 数字一致"
+                : "OCR 数字候选，请核对原图",
+              needsReview: !agreement,
             };
+          }
         } catch (e) {
           ensureActive();
           ocrFailed = true;

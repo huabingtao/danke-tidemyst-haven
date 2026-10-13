@@ -1,5 +1,8 @@
 import { test, expect, type Page, type TestInfo } from "@playwright/test";
 import path from "node:path";
+import { readFileSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
+import { createCanvas, loadImage } from "@napi-rs/canvas";
 async function observe(page: Page, index: number, value: number | "gem") {
   await page.getByTestId(`cell-${index}`).click();
   const dialog = page.getByRole("dialog", { name: /编辑 / });
@@ -319,3 +322,91 @@ test("capture revised desktop and mobile layout and modal", async ({
     path: `docs/screenshots/editor-${testInfo.project.name}.png`,
   });
 });
+
+test("actual user game screenshot automatically fills all 64 cells correctly", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  await upload(page, testInfo, ["tests/fixtures/real/tidemyst-8.jpg"]);
+  await expect(page.getByRole("heading", { name: "房间 2" })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await testInfo.attach("recognized-real-board", {
+    body: await page.evaluate(
+      () => localStorage.getItem("tidemyst-boards-v1") ?? "",
+    ),
+    contentType: "application/json",
+  });
+  const rows = (
+    JSON.parse(readFileSync("tests/fixtures/real/tidemyst-8.json", "utf8")) as {
+      rows: (string | number)[][];
+    }
+  ).rows;
+  for (const [i, value] of rows.flat().entries()) {
+    const label = await page
+      .getByTestId(`cell-${i}`)
+      .getAttribute("aria-label");
+    if (value === "gem") expect(label, `cell ${i}`).toContain("已发现宝石");
+    else if (typeof value === "number")
+      expect(label, `cell ${i}`).toContain(`数字 ${value}`);
+    else expect(label, `cell ${i}`).toMatch(/宝石概率|未知/);
+    expect(label, `cell ${i} uncertainty`).not.toContain("需要核对");
+  }
+  await expect(page.getByText("精确计算", { exact: false })).toBeVisible();
+  await page.screenshot({
+    path: `docs/screenshots/real-import-${testInfo.project.name}.png`,
+    fullPage: true,
+  });
+});
+
+for (const variant of [
+  { scale: 1600 / 2532, brightness: 1, quality: 70 },
+  { scale: 0.4, brightness: 1, quality: 55 },
+  { scale: 1600 / 2532, brightness: 0.8, quality: 75 },
+  { scale: 1600 / 2532, brightness: 1.15, quality: 75 },
+]) {
+  test(`real screenshot survives preprocessing ${JSON.stringify(variant)}`, async ({
+    page,
+  }, testInfo) => {
+    const im = await loadImage("tests/fixtures/real/tidemyst-8.jpg"),
+      canvas = createCanvas(
+        Math.round(im.width * variant.scale),
+        Math.round(im.height * variant.scale),
+      ),
+      ctx = canvas.getContext("2d");
+    ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
+    const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < frame.data.length; i += 4)
+      for (let ch = 0; ch < 3; ch++)
+        frame.data[i + ch] = Math.min(
+          255,
+          frame.data[i + ch] * variant.brightness,
+        );
+    ctx.putImageData(frame, 0, 0);
+    const input = testInfo.outputPath("variant.jpg");
+    await writeFile(input, canvas.toBuffer("image/jpeg", variant.quality));
+    await page.goto("/");
+    await upload(page, testInfo, [input]);
+    await expect(page.getByRole("heading", { name: "房间 2" })).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    const stored = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("tidemyst-boards-v1") ?? "{}"),
+    );
+    const board = stored.boards.find(
+      (b: { id: string }) => b.id === stored.activeId,
+    );
+    const truth = JSON.parse(
+      readFileSync("tests/fixtures/real/tidemyst-8.json", "utf8"),
+    ).rows.flat();
+    await testInfo.attach("recognized-board", {
+      body: JSON.stringify(board),
+      contentType: "application/json",
+    });
+    expect(
+      board.cells.map((c: { observed: string | number }) => c.observed),
+    ).toEqual(truth);
+    expect(
+      board.cells.filter((c: { recognition?: unknown }) => c.recognition),
+    ).toHaveLength(0);
+    await expect(page.getByText("精确计算", { exact: false })).toBeVisible();
+  });
+}

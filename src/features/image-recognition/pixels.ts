@@ -1,3 +1,6 @@
+import { normalizeMask, matchDigit } from "./glyph";
+export { normalizeMask, matchDigit } from "./glyph";
+import { detectGameBoard, classifyGameCell } from "./gameBoard";
 import type { Cell, BoardSize } from "../../core/models";
 export interface Pixels {
   width: number;
@@ -15,6 +18,7 @@ export interface GridDetection {
   size: BoardSize;
   confidence: number;
   reason: string;
+  profile?: "tidemyst";
 }
 export interface GlyphTemplate {
   digit: number | "safe" | "flag";
@@ -88,6 +92,8 @@ export function detectGrid(
   image: Pixels,
   preferred?: BoardSize,
 ): GridDetection {
+  const game = detectGameBoard(image, preferred);
+  if (game) return game;
   const { width: w, height: h, data } = image,
     xEdges = Array<number>(w).fill(0),
     yEdges = Array<number>(h).fill(0);
@@ -163,39 +169,6 @@ export function cellRect(rect: Rect, size: number, index: number): Rect {
     height: h * (1 - 2 * pad),
   };
 }
-export function normalizeMask(
-  binary: number[],
-  width: number,
-  height: number,
-): number[] {
-  let left = width,
-    top = height,
-    right = -1,
-    bottom = -1;
-  binary.forEach((v, i) => {
-    if (v) {
-      const x = i % width,
-        y = Math.floor(i / width);
-      left = Math.min(left, x);
-      right = Math.max(right, x);
-      top = Math.min(top, y);
-      bottom = Math.max(bottom, y);
-    }
-  });
-  if (right < 0) return Array<number>(20 * 28).fill(0);
-  const out: number[] = [];
-  for (let y = 0; y < 28; y++)
-    for (let x = 0; x < 20; x++) {
-      const sx =
-          left +
-          Math.min(right - left, Math.floor((x / 20) * (right - left + 1))),
-        sy =
-          top +
-          Math.min(bottom - top, Math.floor((y / 28) * (bottom - top + 1)));
-      out.push(binary[sy * width + sx]);
-    }
-  return out;
-}
 export function features(image: Pixels): CellFeatures {
   const { width: w, height: h, data } = image;
   // Median perimeter RGB estimates each tile's background, robust to lighting shifts.
@@ -231,29 +204,12 @@ export function features(image: Pixels): CellFeatures {
   const gemScore = colored / binary.length;
   return { mask: normalizeMask(binary, w, h), foreground, gemScore, contrast };
 }
-export function matchDigit(mask: number[], templates: GlyphTemplate[]) {
-  const byDigit = new Map<GlyphTemplate["digit"], number>();
-  for (const t of templates) {
-    let union = 0,
-      intersection = 0;
-    for (let i = 0; i < mask.length; i++) {
-      if (mask[i] || t.mask[i]) union++;
-      if (mask[i] && t.mask[i]) intersection++;
-    }
-    const score = union ? intersection / union : 0;
-    byDigit.set(t.digit, Math.max(score, byDigit.get(t.digit) ?? 0));
-  }
-  const sorted = [...byDigit].sort((a, b) => b[1] - a[1]);
-  return {
-    digit: sorted[0]?.[0] ?? 0,
-    score: sorted[0]?.[1] ?? 0,
-    margin: (sorted[0]?.[1] ?? 0) - (sorted[1]?.[1] ?? 0),
-  };
-}
 export function classifyCell(
   image: Pixels,
   templates: GlyphTemplate[],
+  profile?: "tidemyst",
 ): RecognitionCell {
+  if (profile === "tidemyst") return classifyGameCell(image, templates);
   const f = features(image),
     match = matchDigit(f.mask, templates);
   if (f.foreground < 0.012 || f.contrast < 45)

@@ -23,7 +23,7 @@ flowchart LR
 
 `hooks/useSolver.ts` 在每次房间事实变更后启动任务。替换或卸载时终止旧 worker，旧任务不能覆盖最新棋盘。5 秒/200 万节点是核心枚举预算，12 秒是外层兜底超时；页面可继续编辑或取消。无法启动 worker 时显示明确错误，不以主线程重计算掩盖受限环境。
 
-`features/image-recognition` 的像素纯函数独立可测。主线程仅解码缩放、生成字体模板；自动定位与逐格识别在 image worker 中运行。数字 OCR 自带 worker，所有脚本/WASM/模型均从同源路径加载。缺少 OffscreenCanvas 时，使用主线程 Canvas、逐格让出事件循环和独立 OCR worker。
+`features/image-recognition` 的像素纯函数独立可测。`gameBoard.ts` 负责真实游戏皮肤外框/间隙定位、曝光归一化和金色宝石/蓝色盖板/白色数字分类；`glyph.ts` 管理通用与一像素轮廓容差匹配，`gameDigitTemplates.ts` 只包含校准字形掩码。`GridDetection.profile` 将游戏通路传至识别 worker，其他图片继续使用通用投影。主线程仅解码缩放、生成字体模板；自动定位与逐格识别在 image worker 中运行。数字 OCR 自带 worker，所有脚本/WASM/模型均从同源路径加载。缺少 OffscreenCanvas 时，使用主线程 Canvas、逐格让出事件循环和独立 OCR worker。
 
 `ImageImporter` 管理自动识别进度、取消与多图队列。`automatic.ts` 负责解码、定位、模板/OCR调用及置信度门槛，高置信度直接进入新房间；弱候选存为 Cell.recognition，真实 observed 保持 unknown，不参与求解。用户在主棋盘点击宝石或数字确认后清除候选元数据。非棋盘图片拒绝导入；失败/取消保留原有数据和已成功导入的房间。桌面直接文件选择，手机使用 `ImageSourcePicker` 相册/拍照入口。
 

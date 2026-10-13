@@ -103,6 +103,7 @@ export async function recognizeScreenshot(
     size: detection.size,
     templates: makeTemplates(),
     ocr: true,
+    profile: detection.profile,
     assetBase: new URL(
       `${import.meta.env.BASE_URL}ocr`,
       window.location.href,
