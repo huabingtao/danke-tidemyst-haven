@@ -17,6 +17,7 @@ import {
   Share2,
   Trophy,
 } from "lucide-react";
+import { MainBattle } from "./components/battle/MainBattle";
 import { BattlePage } from "./components/battle/BattlePage";
 import { BattleReadOnly } from "./components/battle/BattleReadOnly";
 import { useBattleLink } from "./hooks/useBattleLink";
@@ -550,6 +551,7 @@ export default function App() {
           <aside className="right-sidebar">
             {board && (
               <>
+                <MainBattle board={board} onMessage={setToast} />
                 <Analysis
                   board={board}
                   {...solver}

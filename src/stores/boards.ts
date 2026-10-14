@@ -33,7 +33,7 @@ interface BoardStore extends Snapshot {
   ) => void;
   setCell: (id: string, index: number, cell: Cell) => void;
   reset: (id: string) => void;
-  settle: (id: string) => void;
+  settle: (id: string) => BattleRecord;
   undo: () => void;
   redo: () => void;
   importData: (data: unknown) => void;
@@ -184,6 +184,7 @@ export const useBoards = create<BoardStore>((set, get) => {
           ? s.records.map((r) => (r.id === record.id ? record : r))
           : [...s.records, record],
       });
+      return record;
     },
     undo: () => {
       const s = get(),

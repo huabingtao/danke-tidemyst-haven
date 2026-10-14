@@ -2834,3 +2834,17 @@ textarea {
   -webkit-touch-callout: default;
   touch-action: auto;
 }
+
+.main-battle { padding-bottom: 24px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.main-battle h2 { display: flex; align-items: center; gap: 8px; font-size: 18px; margin: 0 0 16px; }
+.main-battle .battle-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.main-battle > button { width: 100%; margin-top: 16px; min-height: 44px; }
+.main-battle > p { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 10px 0 0; }
+.main-battle-dialog { width: min(560px, calc(100vw - 32px)); margin: auto; max-height: calc(100dvh - 32px); overflow-y: auto; }
+.main-battle-dialog .poster-preview img { max-height: 58dvh; width: auto; max-width: 100%; margin-inline: auto; object-fit: contain; }
+
+@media (max-width: 639px) {
+  .main-battle-dialog .poster-preview img { max-height: 36dvh; }
+  .main-battle-dialog .poster-tools { gap: 8px; }
+  .main-battle-dialog .poster-tools h3, .main-battle-dialog .poster-tools > p { display: none; }
+}
