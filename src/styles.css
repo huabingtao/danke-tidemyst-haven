@@ -2281,6 +2281,7 @@ textarea {
   background: #0a49ad;
 }
 .battle-nav {
+  justify-content: center;
   min-height: 44px;
   padding: 8px 14px;
   display: inline-flex;

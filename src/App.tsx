@@ -388,6 +388,32 @@ export default function App() {
                   <div className="history-buttons">
                     <button
                       className="icon-button"
+                      aria-label="重置"
+                      title="重置棋盘"
+                      onClick={() => {
+                        if (!window.confirm(`重置房间 ${board.room} 的棋盘？所有格子记录将清空，并开启新局。已保存的战绩会保留。`)) return;
+                        store.reset(board.id);
+                        setSelected(null);
+                        setToast("棋盘已重置，可撤销恢复");
+                      }}
+                    >
+                      <RotateCcw size={17} />
+                    </button>
+                    <button
+                      className="icon-button danger"
+                      aria-label="删除"
+                      title="删除房间"
+                      onClick={() => {
+                        if (!window.confirm(`删除房间 ${board.room}？该房间的棋盘记录将移除，已保存的战绩会保留。`)) return;
+                        store.remove(board.id);
+                        setSelected(null);
+                        setToast("房间已删除，可撤销恢复");
+                      }}
+                    >
+                      <Trash2 size={17} />
+                    </button>
+                    <button
+                      className="icon-button"
                       aria-label="分享当前进度"
                       title="分享当前进度"
                       disabled={sharing}
@@ -469,29 +495,7 @@ export default function App() {
                     <br />
                     概率来自满足全部线索的合法布局。
                   </p>
-                  <div>
-                    <button
-                      className="text-button"
-                      onClick={() => {
-                        store.reset(board.id);
-                        setSelected(null);
-                        setToast("棋盘已重置，可撤销恢复");
-                      }}
-                    >
-                      <RotateCcw size={15} />
-                      重置
-                    </button>
-                    <button
-                      className="text-button danger"
-                      onClick={() => {
-                        store.remove(board.id);
-                        setToast("房间已删除，可撤销恢复");
-                      }}
-                    >
-                      <Trash2 size={15} />
-                      删除
-                    </button>
-                  </div>
+
                 </div>
                 <div className="mobile-actions">
                   <button onClick={requestScreenshot}>
