@@ -10,7 +10,7 @@ stage_dir=$(mktemp -d)
 trap 'rm -rf "$stage_dir"' EXIT
 mkdir -p "$stage_dir/site" "$stage_dir/api"
 cp -R dist/. "$stage_dir/site/"
-cp server/stats.mjs "$stage_dir/api/"
+cp server/stats.mjs server/battle-images.mjs "$stage_dir/api/"
 cp deploy/nginx-https.conf "$stage_dir/nginx.conf"
 cp deploy/tidemyst-stats.service "$stage_dir/stats.service"
 python3 - "$stage_dir" <<'PY'

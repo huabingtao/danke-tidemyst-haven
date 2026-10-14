@@ -4,6 +4,8 @@ import { DatabaseSync } from "node:sqlite";
 import { dirname, resolve } from "node:path";
 import { mkdirSync, realpathSync } from "node:fs";
 import { pathToFileURL } from "node:url";
+import { createBattleImages } from "./battle-images.mjs";
+import { join } from "node:path";
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 const validId = (value) =>
   typeof value === "string" &&
@@ -25,7 +27,12 @@ export function createStatsServer({ databasePath, clock = Date.now }) {
     for (const [id, expiry] of online) if (expiry <= clock()) online.delete(id);
     return { online: online.size, totalCompleted: Number(total.get().count) };
   };
+  const images = createBattleImages({
+    directory: join(dirname(databasePath), "posters"),
+    clock,
+  });
   const server = createServer(async (req, res) => {
+    if (await images.handle(req, res)) return;
     const reply = (code, body) => {
       res.writeHead(code, {
         "Content-Type": "application/json; charset=utf-8",
@@ -79,6 +86,7 @@ export function createStatsServer({ databasePath, clock = Date.now }) {
   return {
     server,
     close: async () => {
+      images.close();
       if (server.listening) {
         server.closeIdleConnections();
         await new Promise((resolveClose, reject) =>

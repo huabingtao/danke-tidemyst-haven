@@ -22,11 +22,19 @@ export default defineConfig({
   ],
   webServer: process.env.E2E_BASE_URL
     ? undefined
-    : {
-        command: "npm run dev",
-        url: baseURL,
-        reuseExistingServer: !process.env.CI,
-        timeout: 30000,
-      },
+    : [
+        {
+          command: "npm run dev",
+          url: baseURL,
+          reuseExistingServer: !process.env.CI,
+          timeout: 30000,
+        },
+        {
+          command: "npm run dev:stats",
+          url: "http://127.0.0.1:3009/api/stats",
+          reuseExistingServer: !process.env.CI,
+          timeout: 30000,
+        },
+      ],
   reporter: "list",
 });

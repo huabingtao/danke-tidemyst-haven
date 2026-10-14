@@ -53,3 +53,42 @@ it("keeps offline completion IDs for retry and sends only anonymous client/round
   expect(Object.keys(payload).sort()).toEqual(["clientId", "roundId"]);
   expect(payload.roundId).toBe("round-a");
 });
+
+it("publishes only PNG bytes and accepts only a same-origin opaque image URL", async () => {
+  vi.stubGlobal("window", { location: { origin: "https://test.example" } });
+  const fetcher = vi
+    .fn()
+    .mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          url: "/api/battle-images/" + "a".repeat(32) + ".png",
+          expiresAt: Date.now() + 86400000,
+        }),
+        { status: 201 },
+      ),
+    );
+  vi.stubGlobal("fetch", fetcher);
+  const { uploadBattleImage } = await import("../../src/adapters/battleImage");
+  const blob = new Blob(["PNG"], { type: "image/png" });
+  expect((await uploadBattleImage(blob)).url).toBe(
+    "https://test.example/api/battle-images/" + "a".repeat(32) + ".png",
+  );
+  expect(fetcher.mock.calls[0][1].body).toBe(blob);
+  fetcher.mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        url: "https://elsewhere.example/a.png",
+        expiresAt: Date.now() + 86400000,
+      }),
+    ),
+  );
+  await expect(uploadBattleImage(blob)).rejects.toThrow("地址无效");
+});
+it("reports a failed image upload without claiming that the photo was saved", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue(new Response("busy", { status: 429 })),
+  );
+  const { uploadBattleImage } = await import("../../src/adapters/battleImage");
+  await expect(uploadBattleImage(new Blob())).rejects.toThrow("过于频繁");
+});

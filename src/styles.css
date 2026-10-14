@@ -2802,3 +2802,34 @@ textarea {
 .battle-empty > svg {
   margin-inline: auto;
 }
+
+.battle-save-dialog {
+  width: min(540px, calc(100vw - 24px));
+  max-height: calc(100dvh - 32px - env(safe-area-inset-bottom));
+  background: var(--bg);
+  color: var(--ink);
+  border: 2px solid var(--primary);
+  border-radius: 20px;
+  padding: 16px;
+  overflow-y: auto;
+}
+.battle-save-dialog::backdrop {
+  background: #102b5fb8;
+}
+.battle-save-dialog p {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 8px 0 12px;
+}
+.battle-save-dialog img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 160px);
+  margin-inline: auto;
+  object-fit: contain;
+  user-select: auto;
+  -webkit-user-select: auto;
+  -webkit-touch-callout: default;
+  touch-action: auto;
+}

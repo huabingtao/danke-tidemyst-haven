@@ -17,6 +17,10 @@ export default defineConfig({
       ],
     },
     proxy: {
+      "/api/battle-images": {
+        target: "http://127.0.0.1:3009",
+        changeOrigin: false,
+      },
       "/api/stats": { target: "http://127.0.0.1:3009", changeOrigin: false },
     },
   },

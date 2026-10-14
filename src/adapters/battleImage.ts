@@ -34,3 +34,52 @@ export function saveBattleImage(url: string) {
   a.download = "潮汐秘境战绩.png";
   a.click();
 }
+
+export interface PublishedBattleImage {
+  url: string;
+  expiresAt: number;
+}
+export async function uploadBattleImage(
+  blob: Blob,
+  signal?: AbortSignal,
+): Promise<PublishedBattleImage> {
+  const abort = new AbortController(),
+    cancel = () => abort.abort();
+  signal?.addEventListener("abort", cancel, { once: true });
+  if (signal?.aborted) abort.abort();
+  const timer = setTimeout(cancel, 20000);
+  try {
+    const response = await fetch("/api/battle-images", {
+      method: "POST",
+      headers: { "Content-Type": "image/png" },
+      body: blob,
+      signal: abort.signal,
+    });
+    if (!response.ok)
+      throw new Error(
+        response.status === 429
+          ? "生成过于频繁，请稍后重试"
+          : "微信图片准备失败，请点击下载图片重试",
+      );
+    const data: unknown = await response.json();
+    if (
+      !data ||
+      typeof data !== "object" ||
+      !("url" in data) ||
+      typeof data.url !== "string" ||
+      !/^\/api\/battle-images\/[a-f0-9]{32}\.png$/.test(data.url) ||
+      !("expiresAt" in data) ||
+      typeof data.expiresAt !== "number" ||
+      !Number.isFinite(data.expiresAt) ||
+      data.expiresAt <= Date.now()
+    )
+      throw new Error("微信图片地址无效，请重新下载");
+    return {
+      url: new URL(data.url, window.location.origin).href,
+      expiresAt: data.expiresAt,
+    };
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener("abort", cancel);
+  }
+}

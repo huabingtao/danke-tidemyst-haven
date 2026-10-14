@@ -24,6 +24,15 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify({ online: 2, totalCompleted: completed.size }),
     });
   });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: async (url: string) =>
+          sessionStorage.setItem("battle-copy", url),
+      },
+    });
+  });
   await page.addInitScript((board) => {
     if (!localStorage.getItem("tidemyst-boards-v1"))
       localStorage.setItem(
@@ -59,9 +68,14 @@ test("battle snapshots, PNGs, read-only restore, re-settlement and cumulative hi
   await page.getByRole("button", { name: "分享当前战绩", exact: true }).click();
   const result = page.getByRole("region", { name: "战绩分享结果" });
   await expect(result.getByTestId("battle-poster")).toBeVisible();
-  const link = await result
-    .getByRole("textbox", { name: "只读战绩链接" })
-    .inputValue();
+  await expect(result.locator(".poster-tools button")).toHaveCount(2);
+  await expect(result.getByRole("textbox")).toHaveCount(0);
+  await result
+    .getByRole("button", { name: "复制战绩链接", exact: true })
+    .click();
+  const link = (await page.evaluate(() =>
+    sessionStorage.getItem("battle-copy"),
+  ))!;
   expect(link).toContain("#battle=");
   await expect(result).toContainText("进行中");
   const downloading = page.waitForEvent("download");
@@ -156,7 +170,7 @@ test("battle snapshots, PNGs, read-only restore, re-settlement and cumulative hi
     fullPage: true,
   });
 });
-test("battle image cancellation, save fallback and unavailable statistics preserve local play", async ({
+test("battle copy fallback and unavailable statistics preserve local play", async ({
   page,
 }) => {
   await page.unroute("**/api/stats**");
@@ -164,14 +178,11 @@ test("battle image cancellation, save fallback and unavailable statistics preser
     route.fulfill({ status: 503, body: "unavailable" }),
   );
   await page.addInitScript(() => {
-    Object.defineProperty(navigator, "canShare", {
+    Object.defineProperty(navigator, "clipboard", {
       configurable: true,
-      value: () => true,
+      value: { writeText: () => Promise.reject(new Error("denied")) },
     });
-    Object.defineProperty(navigator, "share", {
-      configurable: true,
-      value: () => Promise.reject({ name: "AbortError" }),
-    });
+    document.execCommand = () => false;
   });
   await page.goto("/");
   await expect(page.locator(".community-stats")).toContainText("统计暂不可用");
@@ -179,20 +190,21 @@ test("battle image cancellation, save fallback and unavailable statistics preser
   await page.getByRole("button", { name: "分享当前战绩", exact: true }).click();
   const result = page.getByRole("region", { name: "战绩分享结果" });
   await expect(result.getByTestId("battle-poster")).toBeVisible();
+  await expect(result.locator(".poster-tools button")).toHaveCount(2);
   await result
-    .getByRole("button", { name: "分享战绩图片", exact: true })
+    .getByRole("button", { name: "复制战绩链接", exact: true })
     .click();
-  await expect(result).toContainText("已取消图片分享");
-  await page.evaluate(() =>
-    Object.defineProperty(navigator, "canShare", {
-      configurable: true,
-      value: () => false,
-    }),
+  const fallback = page.getByRole("dialog", {
+    name: "手动复制战绩链接",
+    exact: true,
+  });
+  await expect(fallback).toBeVisible();
+  expect(await fallback.getByRole("textbox").inputValue()).toContain(
+    "#battle=",
   );
-  await result
-    .getByRole("button", { name: "分享战绩图片", exact: true })
+  await fallback
+    .getByRole("button", { name: "关闭手动复制", exact: true })
     .click();
-  await expect(result).toContainText("长按预览保存");
   await page.goto("/#battle=invalid!");
   await expect(
     page.getByRole("heading", { name: "无法打开战绩" }),

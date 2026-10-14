@@ -91,3 +91,11 @@ ssh root@124.220.195.160 'ln -s releases/20261013-944701a /var/www/tidemyst-have
 [线上只读战绩](screenshots/production-battle-desktop.png)、[真实 PNG](screenshots/production-battle-poster-desktop.png)。实际微信账号/群发送和手机硬件仍未代替用户测试。
 
 [上线浏览器实拍](screenshots/production-cua.png)保留原深色设置；验收结束临时心跳已自然过期，额外确认在线数回到当前一个浏览器。
+
+
+## 微信图片保存版本
+
+新版本 API 同目录增加 battle-images.mjs；图片在 /var/lib/tidemyst-stats/posters，与版本目录分离。生成卡片临时保存 24 小时，启动/5 分钟周期清理，128MB/512 文件上限；Node 子服务每 IP 60 次/小时。Nginx /api/battle-images 限请求 2MB，正确转发 X-Real-IP；/api/stats 仍限 2KB。不要将临时图片目录备份为永久用户数据。发布脚本同时复制两个服务模块，回滚不会删除累计 SQLite。
+
+
+本次活动版本为 `20261014-wechat-save-1`，两个 API 模块随版本发布；SQLite 中已有 2 局在两次切换后保持，无数据重置。HTTPS 的 15 项线上回归通过，补充的三个线上 GET/HEAD 图片检查也全部通过；Nginx 与 systemd 正常。回滚优先选已保留的 20261014-battle-v2-1 或本次 20261014-wechat-save，图片目录始终独立于版本。
