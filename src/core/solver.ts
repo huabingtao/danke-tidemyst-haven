@@ -220,22 +220,32 @@ export function solveBoard(
     maxMs = options.maxMs ?? 5000;
   class BudgetExceeded extends Error {}
   function enumerate(component: Component): Counts {
-    const vars = [...component.vars].sort(
-      (a, b) =>
-        (memberships.get(b)?.length ?? 0) - (memberships.get(a)?.length ?? 0),
-    );
-    const ways = Array<bigint>(vars.length + 1).fill(0n),
-      hits = new Map(
-        vars.map((v) => [v, Array<bigint>(vars.length + 1).fill(0n)]),
-      );
-    const assignments = new Map<number, number>();
+    // Cells with identical constraint memberships are exchangeable. Enumerate
+    // their gem count once, retaining C(n,k) layouts rather than visiting each
+    // binary permutation. A representative cell occurs in C(n-1,k-1) layouts.
     const cs = component.constraints;
-    const refs = vars.map((v) =>
-      cs.flatMap((c, i) => (c.vars.includes(v) ? [i] : [])),
+    const groupsByRefs = new Map<string, { vars: number[]; refs: number[] }>();
+    for (const v of component.vars) {
+      const refs = cs.flatMap((c, i) => (c.vars.includes(v) ? [i] : []));
+      const key = refs.join(",");
+      const group = groupsByRefs.get(key);
+      if (group) group.vars.push(v);
+      else groupsByRefs.set(key, { vars: [v], refs });
+    }
+    const groups = [...groupsByRefs.values()].sort(
+      (a, b) => b.refs.length - a.refs.length || b.vars.length - a.vars.length,
     );
-    const sums = cs.map(() => 0),
-      unassigned = cs.map((c) => c.vars.length);
-    function visit(depth: number, count: number) {
+    const ways = Array<bigint>(component.vars.length + 1).fill(0n);
+    const groupHits = groups.map(() => Array<bigint>(ways.length).fill(0n));
+    const choices = groups.map((group) =>
+      Array.from({ length: group.vars.length + 1 }, (_, k) =>
+        choose(group.vars.length, k),
+      ),
+    );
+    const assigned = groups.map(() => 0);
+    const sums = cs.map(() => 0);
+    const unassigned = cs.map((c) => c.vars.length);
+    function visit(depth: number, count: number, weight: bigint) {
       nodes++;
       if (
         nodes > maxNodes ||
@@ -243,35 +253,45 @@ export function solveBoard(
       )
         throw new BudgetExceeded();
       if (count > left) return;
-      if (depth === vars.length) {
-        ways[count]++;
-        for (const [v, p] of assignments) if (p) hits.get(v)![count]++;
+      if (depth === groups.length) {
+        ways[count] += weight;
+        groups.forEach((group, i) => {
+          if (assigned[i])
+            groupHits[i][count] +=
+              (weight * BigInt(assigned[i])) / BigInt(group.vars.length);
+        });
         return;
       }
-      const v = vars[depth];
-      for (let p = 0; p <= 1; p++) {
-        for (const ci of refs[depth]) {
-          sums[ci] += p;
-          unassigned[ci]--;
+      const group = groups[depth];
+      const n = group.vars.length;
+      let minimum = 0,
+        maximum = Math.min(n, left - count);
+      for (const ci of group.refs) {
+        minimum = Math.max(
+          minimum,
+          cs[ci].target - sums[ci] - (unassigned[ci] - n),
+        );
+        maximum = Math.min(maximum, cs[ci].target - sums[ci]);
+      }
+      for (let k = minimum; k <= maximum; k++) {
+        for (const ci of group.refs) {
+          sums[ci] += k;
+          unassigned[ci] -= n;
         }
-        if (
-          refs[depth].every(
-            (ci) =>
-              sums[ci] <= cs[ci].target &&
-              sums[ci] + unassigned[ci] >= cs[ci].target,
-          )
-        ) {
-          assignments.set(v, p);
-          visit(depth + 1, count + p);
-          assignments.delete(v);
-        }
-        for (const ci of refs[depth]) {
-          sums[ci] -= p;
-          unassigned[ci]++;
+        assigned[depth] = k;
+        visit(depth + 1, count + k, weight * choices[depth][k]);
+        for (const ci of group.refs) {
+          sums[ci] -= k;
+          unassigned[ci] += n;
         }
       }
+      assigned[depth] = 0;
     }
-    visit(0, 0);
+    visit(0, 0, 1n);
+    const hits = new Map<number, bigint[]>();
+    groups.forEach((group, i) => {
+      for (const v of group.vars) hits.set(v, groupHits[i]);
+    });
     return { ways, hits };
   }
   let counts: Counts[];
