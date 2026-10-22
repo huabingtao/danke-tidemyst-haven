@@ -23,7 +23,8 @@ test("WeChat download previews a normal URL PNG with native long-press enabled a
 }, info) => {
   await page.goto("/");
   const origin = new URL(page.url()).origin;
-  await page.goto(battleLink(snapshot, origin + "/"));
+  await page.getByRole("button", { name: "我的战绩", exact: true }).click();
+  await page.getByRole("button", { name: "分享当前战绩", exact: true }).click();
   const card = page.getByRole("region", { name: "战绩分享卡片" });
   const image = card.getByTestId("battle-poster");
   await expect(image).toHaveAttribute(
@@ -82,7 +83,8 @@ test("WeChat image preparation failure preserves link copying and supports retry
       : route.continue(),
   );
   await page.goto("/");
-  await page.goto(battleLink(snapshot, new URL(page.url()).origin + "/"));
+  await page.getByRole("button", { name: "我的战绩", exact: true }).click();
+  await page.getByRole("button", { name: "分享当前战绩", exact: true }).click();
   const card = page.getByRole("region", { name: "战绩分享卡片" });
   await expect(card).toContainText("微信图片准备失败");
   await expect(
@@ -93,4 +95,19 @@ test("WeChat image preparation failure preserves link copying and supports retry
   await expect(
     page.getByRole("dialog", { name: "保存战绩图片", exact: true }),
   ).toBeVisible();
+});
+
+test("WeChat scanned battle has a leading play entry and no download or image upload", async ({ page }) => {
+  let uploads = 0;
+  await page.route("**/api/battle-images", route => {
+    uploads++;
+    return route.fulfill({ status: 503, body: "not needed" });
+  });
+  await page.goto("/");
+  await page.goto(battleLink(snapshot, new URL(page.url()).origin + "/"));
+  await expect(page.getByRole("link", { name: "我也来一局", exact: true })).toBeInViewport();
+  await expect(page.getByTestId("battle-poster")).toBeVisible();
+  await expect(page.getByRole("button", { name: "下载图片", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "复制战绩链接", exact: true })).toBeVisible();
+  expect(uploads).toBe(0);
 });

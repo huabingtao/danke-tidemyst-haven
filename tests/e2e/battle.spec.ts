@@ -162,7 +162,7 @@ test("battle snapshots, PNGs, read-only restore, re-settlement and cumulative hi
   ).toEqual(before);
   expect(
     await page
-      .getByRole("link", { name: "打开工具，开始我的一局" })
+      .getByRole("link", { name: "我也来一局" })
       .getAttribute("href"),
   ).not.toContain("#battle");
   await page.screenshot({

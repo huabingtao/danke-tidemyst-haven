@@ -21,20 +21,21 @@ export function BattleReadOnly({
         </div>
         <p>{share ? battleLabel(share) : error}</p>
       </header>
+      <a className="primary-button start-own" href={entry}>
+        我也来一局
+        <ArrowRight size={20} />
+      </a>
       {share && (
         <>
           <p className="readonly-note">只读战绩 · 不会更改你的棋盘</p>
           <BattleMetrics stats={share} />
           <BattlePoster
             share={share}
+            showDownload={false}
             url={battleLink(share, window.location.href)}
           />
         </>
       )}
-      <a className="primary-button start-own" href={entry}>
-        打开工具，开始我的一局
-        <ArrowRight size={18} />
-      </a>
     </main>
   );
 }

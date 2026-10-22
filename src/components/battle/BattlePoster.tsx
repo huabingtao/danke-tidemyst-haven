@@ -13,11 +13,13 @@ import { BattleSavePreview, BattleCopyFallback } from "./BattleSavePreview";
 export function BattlePoster({
   share,
   url,
+  showDownload = true,
 }: {
   share: BattleShare;
   url: string;
+  showDownload?: boolean;
 }) {
-  const wechat = detectEnvironment().wechat;
+  const wechat = showDownload && detectEnvironment().wechat;
   const [image, setImage] = useState<{ blob: Blob; src: string } | null>(null),
     [remote, setRemote] = useState<PublishedBattleImage | null>(null),
     [message, setMessage] = useState(""),
@@ -126,13 +128,16 @@ export function BattlePoster({
       <div className="poster-tools">
         <h3>分享这一刻的战绩</h3>
         <p>图片和链接保存相同成绩，后续修改不会改变它。</p>
-        <button
-          className="primary-button"
-          disabled={!image || busy}
-          onClick={() => void download()}
-        >
-          {busy ? <LoaderCircle size={18} /> : <ImageDown size={18} />}下载图片
-        </button>
+        {showDownload && (
+          <button
+            className="primary-button"
+            disabled={!image || busy}
+            onClick={() => void download()}
+          >
+            {busy ? <LoaderCircle size={18} /> : <ImageDown size={18} />}
+            下载图片
+          </button>
+        )}
         <button
           className="secondary-button"
           onClick={async () => {
@@ -150,9 +155,11 @@ export function BattlePoster({
           {busy && image ? "正在准备微信可保存的图片…" : message}
         </p>
         <p className="poster-help">
-          {wechat
-            ? "微信请点击下载图片后长按保存。战绩卡片临时托管 24 小时，游戏截图不上传。"
-            : "下载图片后可发到微信群；复制链接可查看这一刻的成绩。"}
+          {!showDownload
+            ? "复制链接，可分享这份战绩。"
+            : wechat
+              ? "微信请点击下载图片后长按保存。战绩卡片临时托管 24 小时，游戏截图不上传。"
+              : "下载图片后可发到微信群；复制链接可查看这一刻的成绩。"}
         </p>
       </div>
       {preview && (

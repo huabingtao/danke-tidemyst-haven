@@ -2701,7 +2701,14 @@ textarea {
   border-radius: 12px;
 }
 .start-own {
-  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  margin: 0 0 24px;
+  font-size: 18px;
   text-decoration: none;
 }
 .back-board {

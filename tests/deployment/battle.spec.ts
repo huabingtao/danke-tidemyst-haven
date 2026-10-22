@@ -3,7 +3,7 @@ import { createCanvas, loadImage } from "@napi-rs/canvas";
 import jsQR from "jsqr";
 import { battleLink } from "../../src/features/battle/links";
 
-test("public deployment battle has a read-only snapshot and a downloadable QR poster", async ({
+test("public deployment battle has a read-only snapshot and a QR poster and a prominent play entry", async ({
   page,
   request,
 }, info) => {
@@ -34,12 +34,21 @@ test("public deployment battle has a read-only snapshot and a downloadable QR po
   expect(
     await page.evaluate(() => localStorage.getItem("tidemyst-boards-v2")),
   ).toBe(before);
-  const waiting = page.waitForEvent("download");
-  await page.getByRole("button", { name: "下载图片", exact: true }).click();
-  const download = await waiting;
-  const path = `docs/screenshots/production-battle-poster-${info.project.name}.png`;
-  await download.saveAs(path);
-  const image = await loadImage(path),
+  await expect(
+    page.getByRole("button", { name: "下载图片", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "我也来一局", exact: true }),
+  ).toBeInViewport();
+  const entry = page.getByRole("link", { name: "我也来一局", exact: true });
+  expect(await entry.getAttribute("href")).not.toContain("#battle");
+  const pngBytes = await page
+    .getByTestId("battle-poster")
+    .evaluate(async (img: HTMLImageElement) => {
+      const response = await fetch(img.src);
+      return Array.from(new Uint8Array(await response.arrayBuffer()));
+    });
+  const image = await loadImage(Buffer.from(pngBytes)),
     canvas = createCanvas(image.width, image.height),
     ctx = canvas.getContext("2d");
   ctx.drawImage(image, 0, 0);
@@ -61,5 +70,7 @@ test("public deployment battle has a read-only snapshot and a downloadable QR po
   const stats = await response.json();
   expect(stats.online).toBeGreaterThanOrEqual(0);
   expect(stats.totalCompleted).toBeGreaterThanOrEqual(0);
+  await entry.click();
+  await expect(page.locator(".board-grid")).toBeVisible();
   // No completed-round event is emitted by this smoke test.
 });
