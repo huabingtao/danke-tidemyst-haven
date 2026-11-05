@@ -225,9 +225,13 @@ export default function App() {
     >
       <header className="app-header">
         <a className="brand" href="./" aria-label="潮汐秘境首页">
-          <span className="brand-mark">
-            <Gem size={25} strokeWidth={1.7} />
-          </span>
+          <img
+            className="brand-mark brand-logo"
+            src={`${import.meta.env.BASE_URL}brand/chao-mark.svg`}
+            alt=""
+            width={44}
+            height={44}
+          />
           <span>
             <strong>潮汐秘境</strong>
             <small>宝石推理助手</small>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>潮汐秘境 · 潮字徽章</title>
+  <defs>
+    <linearGradient id="amber" x1="10" y1="5" x2="53" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD278"/><stop offset=".53" stop-color="#FF9F27"/><stop offset="1" stop-color="#F46A13"/></linearGradient>
+    <clipPath id="disc"><circle cx="32" cy="32" r="29.5"/></clipPath>
+  </defs>
+  <circle cx="32" cy="32" r="31" fill="#0B1220"/>
+  <circle cx="32" cy="32" r="29.5" fill="url(#amber)"/>
+  <g clip-path="url(#disc)" stroke="#763411" opacity=".16" stroke-width="1.3">
+    <path d="M-8 44q10-9 20-2t20-2 20-2 20-2M-8 51q10-9 20-2t20-2 20-2 20-2M-8 58q10-9 20-2t20-2 20-2 20-2"/>
+    <circle cx="5" cy="62" r="39"/><circle cx="5" cy="62" r="46"/>
+  </g>
+  <circle cx="32" cy="32" r="26" stroke="#FFF2CE" stroke-opacity=".5"/>
+  <!-- Outlined glyph: no client font dependency. -->
+  <path d="M898 29V308L754 307V201Q754 92 705.0 13.5Q656 -65 575 -101Q561 -64 526 -46Q596 -27 642.5 36.0Q689 99 689 201L688 780H962V-12Q962 -68 937 -93Q903 -125 829 -127Q837 -80 808 -43Q826 -48 847 -51Q884 -52 891.0 -43.0Q898 -34 898 29ZM499 -123Q463 -119 428 -123Q431 -57 431 9V144H221V186H431V295H366Q367 271 368 248Q332 251 296 248Q300 313 300 379V562H424V661L286 659Q289 682 286 705L424 703L421 839Q456 835 492 839L489 703H570Q613 703 656 705Q653 682 656 659Q613 661 570 661H489V562H615V295H496V186H577Q620 186 663 188Q661 165 663 142Q620 144 577 144H496V9Q496 -57 499 -123ZM898 550V737H753V552ZM898 351V508L753 507L754 352ZM550 456V520H365Q365 488 365 456ZM550 418H365V333L550 334ZM118 -118Q86 -94 37 -92Q72 -11 108.5 93.0Q145 197 215 454L247 433L156 54ZM180 457 130 408 13 544 63 594ZM195 626Q140 702 76 768L124 820Q191 750 248 670Z" transform="translate(12.3183 46.3727) scale(0.040373 -0.040373)" fill="#142033" stroke="#142033" stroke-width="12" stroke-linejoin="round"/>
+  <path d="m50 9 1.2 3.2 3.3 1.1-3.3 1.2-1.2 3.2-1.1-3.2-3.3-1.2 3.3-1.1Z" fill="#FFF4D7"/>
+</svg>

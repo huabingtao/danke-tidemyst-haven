@@ -2855,3 +2855,22 @@ textarea {
   .main-battle-dialog .poster-tools { gap: 8px; }
   .main-battle-dialog .poster-tools h3, .main-battle-dialog .poster-tools > p { display: none; }
 }
+
+/* Shared circular brand artwork for desktop and mobile headers. */
+.app-header .brand-logo,
+[data-theme="dark"] .app-header .brand-logo {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  object-fit: contain;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+@media (max-width: 640px) {
+  .app-header .brand-logo,
+  [data-theme="dark"] .app-header .brand-logo {
+    width: 36px;
+    height: 36px;
+  }
+}
